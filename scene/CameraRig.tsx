@@ -7,6 +7,9 @@ import { getWorld, segment, type Vec3 } from '@/timeline/chapters';
 import { master } from '@/timeline/store';
 
 const SMOOTHING = 3;
+/** Portrait phones cannot sit the Core beside the text, so it moves above the text instead. */
+const PORTRAIT_PULLBACK = 1.45;
+const PORTRAIT_DROP = 2.4;
 const nextPosition = new Vector3();
 const nextTarget = new Vector3();
 
@@ -25,7 +28,7 @@ function blendInto(out: Vector3, a: Vec3, b: Vec3, blend: number): Vector3 {
 export function CameraRig({ pathname }: { pathname: string }) {
   const lookAt = useRef(new Vector3());
 
-  useFrame(({ camera }, delta) => {
+  useFrame(({ camera, size }, delta) => {
     const chapters = getWorld(pathname).chapters;
     const { from, to, blend } = segment(master.chapter, chapters.length);
     const a = chapters[from].camera;
@@ -33,6 +36,13 @@ export function CameraRig({ pathname }: { pathname: string }) {
 
     blendInto(nextPosition, a.position, b.position, blend);
     blendInto(nextTarget, a.target, b.target, blend);
+
+    if (size.width < size.height) {
+      nextPosition.x *= 0.4;
+      nextPosition.z *= PORTRAIT_PULLBACK;
+      nextTarget.x *= 0.15;
+      nextTarget.y -= PORTRAIT_DROP;
+    }
 
     const amount = 1 - Math.exp(-SMOOTHING * delta);
     camera.position.lerp(nextPosition, amount);

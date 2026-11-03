@@ -69,6 +69,26 @@ html.lenis body {
   }
 }
 
+/* Soft shade behind the nav and counter for when bright gold passes under them. */
+.hud-header::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 7rem;
+  background: linear-gradient(to bottom, rgb(2 6 23 / 0.6), transparent);
+}
+
+/* Keeps text readable over a bright scene without a hard edge. */
+.chapter-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgb(2 6 23 / 0.72), rgb(2 6 23 / 0.3) 34%, transparent 62%);
+  pointer-events: none;
+}
+
 .headline {
   max-width: min(100%, 62rem);
   font-size: clamp(2.25rem, 7vw, 6.5rem);

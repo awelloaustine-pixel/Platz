@@ -27,9 +27,9 @@ export default function CanvasRoot({ tier, pathname }: { tier: Tier; pathname: s
       className={`pointer-events-none fixed inset-0 z-0 transition-opacity duration-1000 ${ready ? 'opacity-100' : 'opacity-0'}`}
     >
       <Canvas
-        dpr={tier === 'high' ? [1, 2] : [1, 1.5]}
-        gl={{ antialias: tier === 'high', powerPreference: 'high-performance' }}
-        camera={{ position: [0, 0, 9], fov: 35, near: 0.1, far: 100 }}
+        dpr={tier === 'high' ? [1, 1.75] : [1, 1.5]}
+        gl={{ antialias: false, powerPreference: 'high-performance', stencil: false }}
+        camera={{ position: [0, 0, 16], fov: 35, near: 0.1, far: 160 }}
         onCreated={() => setReady(true)}
       >
         <PerformanceMonitor
@@ -38,7 +38,7 @@ export default function CanvasRoot({ tier, pathname }: { tier: Tier; pathname: s
             if (performance.now() - mountedAt.current > SETTLE_MS) reportFrameRateDecline();
           }}
         />
-        <Experience pathname={pathname} />
+        <Experience pathname={pathname} tier={tier} />
       </Canvas>
     </div>
   );

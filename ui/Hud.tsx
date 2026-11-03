@@ -31,7 +31,7 @@ function ChapterCounter() {
 export function Hud() {
   return (
     <>
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-40 grid grid-cols-[1fr_auto_1fr] items-start gap-3 px-4 pt-3 lg:px-10 lg:pt-6 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+      <header className="hud-header pointer-events-none fixed inset-x-0 top-0 z-40 grid grid-cols-[1fr_auto_1fr] items-start gap-3 px-4 pt-3 lg:px-10 lg:pt-6 [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
         <Link href="/" aria-label={`${site.name} home`} className="flex min-h-11 items-center gap-2.5 justify-self-start lg:min-h-6">
           <Image src="/logo.svg" alt="" width={28} height={28} unoptimized priority />
           <span className="hidden text-sm tracking-wide text-white sm:inline">{site.shortName}</span>
