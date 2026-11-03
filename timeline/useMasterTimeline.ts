@@ -28,7 +28,7 @@ function publish(pathname: string): void {
   const b = chapters[to];
   ui.set({
     chapterIndex: activeChapterIndex(master.chapter, chapters.length),
-    petalsLit: Math.round(a.petalsLit + (b.petalsLit - a.petalsLit) * blend),
+    litCount: Math.round(a.lit + (b.lit - a.lit) * blend),
     leadsCaptured: Math.floor(a.leads + (b.leads - a.leads) * blend),
   });
   emitMaster();

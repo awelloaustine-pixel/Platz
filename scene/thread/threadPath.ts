@@ -1,3 +1,4 @@
+import { CatmullRomCurve3, Vector3 } from 'three';
 import type { ThreadState, Vec3 } from '@/timeline/chapters';
 
 export type BeamGroup = 'main' | 'cross' | 'splinter' | 'lanes' | 'loop';
@@ -116,6 +117,12 @@ export const BEAMS: readonly BeamDefinition[] = [
   },
   { group: 'loop', radius: 0.05, closed: true, points: ring(5.5, 0.55, 0.35) },
 ];
+
+/** The main thread as a curve, so other parts of the scene can sit exactly on it. */
+export function threadCurve(): CatmullRomCurve3 {
+  const main = BEAMS.find((beam) => beam.group === 'main');
+  return new CatmullRomCurve3((main?.points ?? []).map(([x, y, z]) => new Vector3(x, y, z)));
+}
 
 /** How strongly each group of beams shows in each story state. */
 export const THREAD_WEIGHTS: Record<ThreadState, Record<BeamGroup, number>> = {

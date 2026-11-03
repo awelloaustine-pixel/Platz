@@ -29,7 +29,7 @@ function NairobiClock() {
 }
 
 export function HudReadouts() {
-  const petalsLit = useUi((state) => state.petalsLit);
+  const litCount = useUi((state) => state.litCount);
   const leads = useUi((state) => state.leadsCaptured);
   const tier = useUi((state) => state.tier);
   const canToggle = useUi((state) => state.webgl && !state.reducedMotion);
@@ -48,9 +48,9 @@ export function HudReadouts() {
         </div>
         <div className="flex gap-1.5">
           <dt>
-            PETALS<span className="hidden lg:inline"> LIT</span>
+            STONES<span className="hidden lg:inline"> LIT</span>
           </dt>
-          <dd className="text-white tabular-nums">{petalsLit}/12</dd>
+          <dd className="text-white tabular-nums">{litCount}/12</dd>
         </div>
         <div className="hidden gap-1.5 sm:flex">
           <dt>LEADS CAPTURED</dt>

@@ -79,12 +79,12 @@ html.lenis body {
   background: linear-gradient(to bottom, rgb(2 6 23 / 0.6), transparent);
 }
 
-/* Keeps text readable over a bright scene without a hard edge. */
-.chapter-stage::before {
-  content: '';
-  position: absolute;
+/* Keeps text readable over a bright scene. Fixed to the viewport, not to a section,
+   because a shade that scrolled with its section showed a hard band as it left. */
+.scene-shade {
+  position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 5;
   background: linear-gradient(to top, rgb(2 6 23 / 0.72), rgb(2 6 23 / 0.3) 34%, transparent 62%);
   pointer-events: none;
 }
@@ -221,5 +221,12 @@ html.lenis body {
   .btn-gold,
   .btn-ghost {
     transition: none;
+  }
+}
+
+/* Portrait text sits over the scene's brightest area, so the shade reaches higher. */
+@media (max-width: 63.99rem) {
+  .scene-shade {
+    background: linear-gradient(to top, rgb(2 6 23 / 0.86), rgb(2 6 23 / 0.66) 48%, transparent 74%);
   }
 }

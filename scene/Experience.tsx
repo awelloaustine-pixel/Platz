@@ -8,13 +8,14 @@ import type { Tier } from '@/lib/quality';
 import { CameraRig } from './CameraRig';
 import { Core } from './core/Core';
 import { Atmosphere } from './effects/Atmosphere';
+import { Debris } from './effects/Debris';
 import { Dust } from './effects/Dust';
 import { Effects } from './effects/Effects';
 import { GradeRig } from './effects/GradeRig';
-import { Shards } from './effects/Shards';
+import { Gates } from './thread/Gates';
 import { Thread } from './thread/Thread';
 
-/** Metal reflects its surroundings, so without this studio the Core renders almost black. */
+/** Soft fill so the far sides of the rocks hold some shape instead of falling to black. */
 function Studio() {
   return (
     <Environment resolution={64} frames={1}>
@@ -58,10 +59,11 @@ export function Experience({ pathname, tier }: { pathname: string; tier: Tier })
       <GradeRig pathname={pathname} />
       <Atmosphere pathname={pathname} />
       <Dust pathname={pathname} tier={tier} />
-      <Shards tier={tier} />
+      <Debris tier={tier} />
       <PointerTilt>
         <Core key={tier} pathname={pathname} tier={tier} />
         <Thread pathname={pathname} tier={tier} />
+        <Gates pathname={pathname} />
       </PointerTilt>
       <Effects tier={tier} />
     </>

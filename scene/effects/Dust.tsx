@@ -28,7 +28,7 @@ const vertexShader = /* glsl */ `
     // Cheap depth of field: points away from the focal plane become large soft discs.
     vBlur = clamp(abs(depth - uFocus) / (uFocus * 0.85), 0.0, 1.0);
     vPhase = aPhase;
-    gl_PointSize = aSize * uPixelRatio * (1.0 + vBlur * vBlur * 16.0) * (70.0 / max(depth, 0.5));
+    gl_PointSize = aSize * uPixelRatio * (1.0 + vBlur * vBlur * 10.0) * (70.0 / max(depth, 0.5));
     gl_Position = projectionMatrix * view;
   }
 `;
@@ -86,7 +86,7 @@ function placeInSkyline(random: () => number): [number, number, number] {
 }
 
 export function Dust({ pathname, tier }: { pathname: string; tier: Tier }) {
-  const count = tier === 'high' ? 2400 : 800;
+  const count = tier === 'high' ? 1500 : 700;
   const volume = useDustGeometry(count, 11, placeInVolume);
   const city = useDustGeometry(tier === 'high' ? 340 : 140, 23, placeInSkyline);
   const dust = useRef<ShaderMaterial>(null);

@@ -2,46 +2,68 @@
 
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
-import { MathUtils, PerspectiveCamera, Vector3 } from 'three';
-import { getWorld, segment, type Vec3 } from '@/timeline/chapters';
+import { CatmullRomCurve3, MathUtils, PerspectiveCamera, Vector3 } from 'three';
+import { buildRail, getWorld, railParameter, sampleChapter, type Vec3 } from '@/timeline/chapters';
 import { master } from '@/timeline/store';
 
-const SMOOTHING = 3;
+const SMOOTHING = 4.5;
 /** Portrait phones cannot sit the Core beside the text, so it moves above the text instead. */
 const PORTRAIT_PULLBACK = 1.45;
 const PORTRAIT_DROP = 2.4;
+
 const nextPosition = new Vector3();
 const nextTarget = new Vector3();
+const toVector = ([x, y, z]: Vec3) => new Vector3(x, y, z);
 
-function blendInto(out: Vector3, a: Vec3, b: Vec3, blend: number): Vector3 {
-  return out.set(
-    MathUtils.lerp(a[0], b[0], blend),
-    MathUtils.lerp(a[1], b[1], blend),
-    MathUtils.lerp(a[2], b[2], blend),
-  );
+interface Rail {
+  positions: CatmullRomCurve3 | null;
+  targets: CatmullRomCurve3 | null;
+  fallback: { position: Vector3; target: Vector3 };
+}
+
+const rails = new Map<string, Rail>();
+
+/** One continuous camera path per world, so a chapter change is never a cut. */
+function getRail(pathname: string): Rail {
+  const cached = rails.get(pathname);
+  if (cached) return cached;
+  const { positions, targets } = buildRail(getWorld(pathname).chapters);
+  const rail: Rail = {
+    positions: positions.length > 1 ? new CatmullRomCurve3(positions.map(toVector)) : null,
+    targets: targets.length > 1 ? new CatmullRomCurve3(targets.map(toVector)) : null,
+    fallback: { position: toVector(positions[0]), target: toVector(targets[0]) },
+  };
+  rails.set(pathname, rail);
+  return rail;
 }
 
 /**
- * Follows the sampled chapter. Damping, not jumping, is what makes a route change fly
- * the camera to the next world: the new world's shot simply becomes the target.
+ * Follows the rail. Damping, not jumping, is what makes a route change fly the camera
+ * to the next world: the new world's shot simply becomes the target.
  */
 export function CameraRig({ pathname }: { pathname: string }) {
   const lookAt = useRef(new Vector3());
 
   useFrame(({ camera, size }, delta) => {
     const chapters = getWorld(pathname).chapters;
-    const { from, to, blend } = segment(master.chapter, chapters.length);
-    const a = chapters[from].camera;
-    const b = chapters[to].camera;
+    const rail = getRail(pathname);
+    const along = railParameter(chapters, master.chapter);
 
-    blendInto(nextPosition, a.position, b.position, blend);
-    blendInto(nextTarget, a.target, b.target, blend);
+    if (rail.positions && rail.targets) {
+      rail.positions.getPoint(along, nextPosition);
+      rail.targets.getPoint(along, nextTarget);
+    } else {
+      nextPosition.copy(rail.fallback.position);
+      nextTarget.copy(rail.fallback.target);
+    }
 
     if (size.width < size.height) {
-      nextPosition.x *= 0.4;
-      nextPosition.z *= PORTRAIT_PULLBACK;
-      nextTarget.x *= 0.15;
-      nextTarget.y -= PORTRAIT_DROP;
+      // Shots that fly along the thread opt out, or the camera would miss the gates.
+      const framing = sampleChapter(chapters, master.chapter, (chapter) => chapter.framing ?? 1);
+      nextPosition.x *= MathUtils.lerp(1, 0.4, framing);
+      nextPosition.z *= MathUtils.lerp(1, PORTRAIT_PULLBACK, framing);
+      nextTarget.x *= MathUtils.lerp(1, 0.15, framing);
+      nextTarget.y -= PORTRAIT_DROP * framing;
     }
 
     const amount = 1 - Math.exp(-SMOOTHING * delta);
@@ -50,7 +72,8 @@ export function CameraRig({ pathname }: { pathname: string }) {
     camera.lookAt(lookAt.current);
 
     if (camera instanceof PerspectiveCamera) {
-      camera.fov = MathUtils.damp(camera.fov, MathUtils.lerp(a.fov, b.fov, blend), SMOOTHING, delta);
+      const fov = sampleChapter(chapters, master.chapter, (chapter) => chapter.camera.fov);
+      camera.fov = MathUtils.damp(camera.fov, fov, SMOOTHING, delta);
       camera.updateProjectionMatrix();
     }
   });

@@ -1,6 +1,14 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { activeChapterIndex, formatChapter, getWorld, sampleChapter, segment } from './chapters.ts';
+import {
+  activeChapterIndex,
+  buildRail,
+  formatChapter,
+  getWorld,
+  railParameter,
+  sampleChapter,
+  segment,
+} from './chapters.ts';
 
 test('home has the seven chapters of the storyboard', () => {
   assert.deepEqual(
@@ -9,10 +17,10 @@ test('home has the seven chapters of the storyboard', () => {
   );
 });
 
-test('every petal count stays within the machine', () => {
+test('every lit count stays within the 12 stones', () => {
   for (const path of ['/', '/websites', '/automations', '/ai-visibility', '/pricing', '/about', '/contact']) {
     for (const chapter of getWorld(path).chapters) {
-      assert.ok(chapter.petalsLit >= 0 && chapter.petalsLit <= 12, `${path} ${chapter.id}`);
+      assert.ok(chapter.lit >= 0 && chapter.lit <= 12, `${path} ${chapter.id}`);
     }
   }
 });
@@ -26,9 +34,26 @@ test('segment blends between neighbours and clamps at both ends', () => {
 
 test('sampleChapter blends a value between chapters', () => {
   const { chapters } = getWorld('/');
-  // Chapter 3 lights 4 petals and chapter 4 lights all 12.
-  assert.equal(sampleChapter(chapters, 3.5, (chapter) => chapter.petalsLit), 8);
-  assert.equal(sampleChapter(chapters, 6, (chapter) => chapter.petalsLit), 12);
+  // Chapter 3 lights 4 stones and chapter 4 lights all 12.
+  assert.equal(sampleChapter(chapters, 3.5, (chapter) => chapter.lit), 8);
+  assert.equal(sampleChapter(chapters, 6, (chapter) => chapter.lit), 12);
+});
+
+test('the rail runs through every chapter shot and ride point in order', () => {
+  const { chapters } = getWorld('/');
+  const { positions } = buildRail(chapters);
+  const rideLength = chapters.reduce((sum, chapter) => sum + (chapter.ride?.length ?? 0), 0);
+  assert.equal(positions.length, chapters.length + rideLength);
+
+  // Each chapter at rest must land exactly on its own shot, including those after the ride.
+  chapters.forEach((chapter, index) => {
+    const point = Math.round(railParameter(chapters, index) * (positions.length - 1));
+    assert.deepEqual(positions[point], chapter.camera.position, chapter.id);
+  });
+});
+
+test('a one-shot world has a rail parameter of zero', () => {
+  assert.equal(railParameter(getWorld('/contact').chapters, 0), 0);
 });
 
 test('the active chapter changes at the halfway point and stays in range', () => {

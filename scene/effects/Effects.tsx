@@ -9,10 +9,10 @@ import type { Tier } from '@/lib/quality';
 import { master } from '@/timeline/store';
 
 const RESTING_OFFSET = 0.00035;
-const TRANSITION_OFFSET = 0.0034;
+const TRANSITION_OFFSET = 0.0014;
 
 /**
- * Only values above 1 bloom, so the gold and the thread glow while metal and text stay crisp.
+ * Only values above 1 bloom, so the gold and the thread glow while rock and text stay crisp.
  * A DepthOfField pass held Iris Xe laptops to 22-25fps, so Dust fakes lens blur in its shader.
  */
 export function Effects({ tier }: { tier: Tier }) {

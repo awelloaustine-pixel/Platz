@@ -28,7 +28,7 @@ export function emitMaster(): void {
 /** Discrete state for the DOM. Holds primitives only, so changes are cheap to compare. */
 export interface UiState {
   chapterIndex: number;
-  petalsLit: number;
+  litCount: number;
   leadsCaptured: number;
   /** null until detection has finished. */
   tier: Tier | null;
@@ -42,7 +42,7 @@ export interface UiState {
 
 const initialState: UiState = {
   chapterIndex: 0,
-  petalsLit: 0,
+  litCount: 0,
   leadsCaptured: 0,
   tier: null,
   autoTier: null,

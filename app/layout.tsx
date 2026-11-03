@@ -43,6 +43,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </a>
         <Backdrop />
         <SceneMount />
+        <div aria-hidden="true" className="scene-shade" />
         <Hud />
         <main id="main">{children}</main>
         <AppRuntime />

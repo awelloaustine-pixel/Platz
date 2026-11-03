@@ -2,7 +2,16 @@
 
 import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
-import { AdditiveBlending, CatmullRomCurve3, Color, type Mesh, type ShaderMaterial, TubeGeometry, Vector3 } from 'three';
+import {
+  AdditiveBlending,
+  CatmullRomCurve3,
+  Color,
+  MathUtils,
+  type Mesh,
+  type ShaderMaterial,
+  TubeGeometry,
+  Vector3,
+} from 'three';
 import type { Tier } from '@/lib/quality';
 import { getWorld, segment } from '@/timeline/chapters';
 import { master } from '@/timeline/store';
@@ -75,7 +84,8 @@ export function Thread({ pathname, tier }: { pathname: string; tier: Tier }) {
     state.flare += (flareTarget * draw - state.flare) * amount;
     if (flareMesh.current && flareMaterial.current) {
       flareMesh.current.quaternion.copy(camera.quaternion);
-      flareMaterial.current.uniforms.uWeight.value = state.flare;
+      const nearness = MathUtils.smoothstep(camera.position.distanceTo(flareMesh.current.position), 3, 10);
+      flareMaterial.current.uniforms.uWeight.value = state.flare * nearness;
       flareMaterial.current.uniforms.uTime.value = state.time;
       flareMaterial.current.uniforms.uColor.value.copy(state.color);
     }
