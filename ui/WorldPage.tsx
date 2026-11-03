@@ -11,15 +11,24 @@ export function WorldPage({ path }: { path: string }) {
   return (
     <>
       {chapters.map((chapter, index) => (
-        <ChapterSection key={chapter.id} chapter={chapter} index={index} heading={index === 0 ? 'h1' : 'h2'} showLabel={index > 0}>
-          {index === 0 && sub && <p className="lede">{sub}</p>}
-          {index === 0 && path !== '/contact' && (
-            <div className="mt-8">
-              <Link href="/contact" className="btn-gold">
-                Get Started →
-              </Link>
-            </div>
-          )}
+        <ChapterSection
+          key={chapter.id}
+          chapter={chapter}
+          index={index}
+          heading={index === 0 ? 'h1' : 'h2'}
+          showLabel={index > 0}
+          large={index === 0}
+        >
+          <div className={index === 0 ? 'reveal reveal-now' : 'reveal'}>
+            {index === 0 && sub && <p className="lede">{sub}</p>}
+            {index === 0 && path !== '/contact' && (
+              <div className="mt-8">
+                <Link href="/contact" className="btn-gold">
+                  Get Started →
+                </Link>
+              </div>
+            )}
+          </div>
         </ChapterSection>
       ))}
     </>

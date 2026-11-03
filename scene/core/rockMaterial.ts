@@ -5,7 +5,7 @@ import { MeshStandardMaterial } from 'three';
  * aEmissive is the vein colour (HDR, so it blooms). aFront is how far from the centre
  * of the scene ignition has reached, so light travels outward across each rock.
  */
-export function createRockMaterial(octaves: 2 | 3): MeshStandardMaterial {
+export function createRockMaterial(octaves: 2 | 3 = 2): MeshStandardMaterial {
   const material = new MeshStandardMaterial({ color: '#4a4a50', roughness: 0.94, metalness: 0.02 });
 
   material.onBeforeCompile = (shader) => {

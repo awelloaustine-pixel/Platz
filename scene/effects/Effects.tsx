@@ -30,7 +30,7 @@ export function Effects({ tier }: { tier: Tier }) {
   if (tier === 'high') {
     return (
       <EffectComposer multisampling={0}>
-        <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.2} intensity={0.6} radius={0.72} />
+        <Bloom mipmapBlur luminanceThreshold={1} luminanceSmoothing={0.2} intensity={0.6} radius={0.72} levels={5} />
         <ChromaticAberration ref={aberration} offset={offset} radialModulation={false} modulationOffset={0} />
         <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
         <Vignette eskil={false} offset={0.28} darkness={0.72} />

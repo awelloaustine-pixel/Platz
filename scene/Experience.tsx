@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { type Group, MathUtils } from 'three';
 import type { Tier } from '@/lib/quality';
+import { AnchorProjector } from './AnchorProjector';
 import { CameraRig } from './CameraRig';
 import { Core } from './core/Core';
 import { Atmosphere } from './effects/Atmosphere';
@@ -56,6 +57,7 @@ export function Experience({ pathname, tier }: { pathname: string; tier: Tier })
       <ambientLight intensity={0.12} />
       <Studio />
       <CameraRig pathname={pathname} />
+      <AnchorProjector pathname={pathname} />
       <GradeRig pathname={pathname} />
       <Atmosphere pathname={pathname} />
       <Dust pathname={pathname} tier={tier} />

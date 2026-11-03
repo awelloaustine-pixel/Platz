@@ -5,7 +5,9 @@ import { site } from '@/content/site';
 import { SceneMount } from '@/scene/SceneMount';
 import { AppRuntime } from '@/ui/AppRuntime';
 import { Backdrop } from '@/ui/Backdrop';
+import { Cursor } from '@/ui/Cursor';
 import { Hud } from '@/ui/Hud';
+import { Loader } from '@/ui/Loader';
 import './globals.css';
 
 // next/font downloads these at build time and serves them from this site.
@@ -34,9 +36,15 @@ export const viewport: Viewport = {
   themeColor: '#020617',
 };
 
+// Runs before first paint. Without it (no JS) nothing is hidden, so every visitor gets the text.
+const PRE_PAINT_SCRIPT = `(function(){var r=document.documentElement;r.classList.add('js');try{var c=navigator.connection;if(sessionStorage.getItem('platinum.seen')||innerWidth<1024||(c&&(c.saveData||/2g|3g/.test(c.effectiveType||'')))||matchMedia('(prefers-reduced-motion: reduce)').matches){r.classList.add('seen')}sessionStorage.setItem('platinum.seen','1')}catch(e){r.classList.add('seen')}})()`;
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en-KE" className={`${interTight.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en-KE" className={`${interTight.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: PRE_PAINT_SCRIPT }} />
+      </head>
       <body>
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-full focus:bg-gold focus:px-4 focus:py-2 focus:text-ink">
           Skip to content
@@ -46,6 +54,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <div aria-hidden="true" className="scene-shade" />
         <Hud />
         <main id="main">{children}</main>
+        <Cursor />
+        <Loader />
         <AppRuntime />
       </body>
     </html>

@@ -10,7 +10,9 @@ import { Experience } from './Experience';
 // Shader compilation always stutters at first, so give the scene time to settle
 // before a low frame rate counts against the device.
 const SETTLE_MS = 4000;
-const FPS_BOUNDS = (): [number, number] => [30, 55];
+// The floor sits below 30 because a steady 30fps, which laptops often lock to on battery, is
+// smooth enough to keep. Only a rate that is genuinely struggling should lose the 3D.
+const FPS_BOUNDS = (): [number, number] => [26, 55];
 
 export default function CanvasRoot({ tier, pathname }: { tier: Tier; pathname: string }) {
   const [ready, setReady] = useState(false);

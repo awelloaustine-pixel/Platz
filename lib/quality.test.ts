@@ -29,6 +29,12 @@ test('each slow-device signal forces lite on its own', () => {
   }
 });
 
+test('a 3g reading only forces lite on a phone', () => {
+  assert.equal(decideTier({ ...desktop, effectiveType: '3g' }).tier, 'high');
+  assert.equal(decideTier({ ...phone, effectiveType: '3g' }).tier, 'lite');
+  assert.equal(decideTier({ ...desktop, effectiveType: '2g' }).tier, 'lite');
+});
+
 test('an unknown GPU does not push a phone to lite', () => {
   assert.equal(decideTier({ ...phone, gpuTier: undefined }).tier, 'medium');
 });

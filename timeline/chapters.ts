@@ -304,7 +304,9 @@ export function railParameter(chapters: readonly ChapterConfig[], chapter: numbe
 }
 
 export function activeChapterIndex(chapter: number, count: number): number {
-  return Math.min(Math.max(Math.round(chapter), 0), Math.max(count - 1, 0));
+  // A chapter's value reaches i when its section top meets the viewport top, but its text is
+  // already on screen about a quarter of the way through the section before.
+  return Math.min(Math.max(Math.floor(chapter + 0.25), 0), Math.max(count - 1, 0));
 }
 
 export function formatChapter(index: number): string {

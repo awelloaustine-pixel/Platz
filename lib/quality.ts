@@ -16,7 +16,7 @@ export interface QualitySignals {
   gpuTier?: number;
 }
 
-const SLOW_NETWORKS = new Set(['slow-2g', '2g', '3g']);
+const VERY_SLOW_NETWORKS = new Set(['slow-2g', '2g']);
 const ORDER: readonly Tier[] = ['lite', 'medium', 'high'];
 
 export function decideTier(signals: QualitySignals): { tier: Tier; reason: string } {
@@ -24,7 +24,11 @@ export function decideTier(signals: QualitySignals): { tier: Tier; reason: strin
 
   if (!webgl) return { tier: 'lite', reason: 'webgl-unavailable' };
   if (saveData) return { tier: 'lite', reason: 'save-data' };
-  if (effectiveType && SLOW_NETWORKS.has(effectiveType)) return { tier: 'lite', reason: 'slow-network' };
+  // Chrome's estimate was seen reading "3g" on a fast laptop, so "3g" only counts on a phone,
+  // where a heavy download is a real cost and a slow connection is much more likely.
+  if (effectiveType && (VERY_SLOW_NETWORKS.has(effectiveType) || (mobile && effectiveType === '3g'))) {
+    return { tier: 'lite', reason: 'slow-network' };
+  }
   if (deviceMemory !== undefined && deviceMemory <= 2) return { tier: 'lite', reason: 'low-memory' };
   if (cores !== undefined && cores <= 2) return { tier: 'lite', reason: 'few-cores' };
   if (gpuTier === 0) return { tier: 'lite', reason: 'gpu-blocklisted' };

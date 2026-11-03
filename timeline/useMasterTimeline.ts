@@ -34,6 +34,17 @@ function publish(pathname: string): void {
   emitMaster();
 }
 
+/** How close to a chapter's rest point, in viewport heights, before scrolling settles onto it. */
+const SNAP_REACH = 0.12;
+
+function canSnap(): boolean {
+  return (
+    window.innerWidth >= 1024 &&
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
 function whenIdle(callback: () => void): () => void {
   if ('requestIdleCallback' in window) {
     const handle = window.requestIdleCallback(callback, { timeout: 1500 });
@@ -103,7 +114,27 @@ export function useMasterTimeline(pathname: string): void {
         if (max > 0) {
           timeline = gsap.timeline({
             defaults: { ease: 'none' },
-            scrollTrigger: { start: 0, end: 'max', scrub: reducedMotion ? true : 1.2 },
+            scrollTrigger: {
+              start: 0,
+              end: 'max',
+              scrub: reducedMotion ? true : 1.2,
+              // Desktop only, and only when already close: it should settle, never fight the visitor.
+              snap: canSnap()
+                ? {
+                    snapTo: (value: number) => {
+                      const position = value * max;
+                      const nearest = tops.reduce((best, top) =>
+                        Math.abs(top - position) < Math.abs(best - position) ? top : best,
+                      );
+                      return Math.abs(nearest - position) < window.innerHeight * SNAP_REACH ? nearest / max : value;
+                    },
+                    delay: 0.2,
+                    duration: { min: 0.25, max: 0.6 },
+                    ease: 'power2.inOut',
+                    inertia: false,
+                  }
+                : undefined,
+            },
             onUpdate: () => publish(pathRef.current),
           });
           // Timeline time is measured in scrolled pixels, so each tween spans its section.

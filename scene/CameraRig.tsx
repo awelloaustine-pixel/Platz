@@ -3,14 +3,20 @@
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { CatmullRomCurve3, MathUtils, PerspectiveCamera, Vector3 } from 'three';
-import { buildRail, getWorld, railParameter, sampleChapter, type Vec3 } from '@/timeline/chapters';
-import { master } from '@/timeline/store';
+import { activeChapterIndex, buildRail, getWorld, railParameter, sampleChapter, type Vec3 } from '@/timeline/chapters';
+import { master, ui } from '@/timeline/store';
+import { BEAMS } from './thread/threadPath';
 
 const SMOOTHING = 4.5;
 /** Portrait phones cannot sit the Core beside the text, so it moves above the text instead. */
 const PORTRAIT_PULLBACK = 1.45;
 const PORTRAIT_DROP = 2.4;
 
+const LANE_POINTS = BEAMS.filter((beam) => beam.group === 'lanes').map(
+  ({ points: [, , [x, y, z]] }) => new Vector3(x, y, z),
+);
+const LANE_APPROACH = new Vector3(0, 0.8, 6);
+const laneCamera = new Vector3();
 const nextPosition = new Vector3();
 const nextTarget = new Vector3();
 const toVector = ([x, y, z]: Vec3) => new Vector3(x, y, z);
@@ -64,6 +70,14 @@ export function CameraRig({ pathname }: { pathname: string }) {
       nextPosition.z *= MathUtils.lerp(1, PORTRAIT_PULLBACK, framing);
       nextTarget.x *= MathUtils.lerp(1, 0.15, framing);
       nextTarget.y -= PORTRAIT_DROP * framing;
+    }
+
+    const { laneFocus } = ui.get();
+    const shot = chapters[activeChapterIndex(master.chapter, chapters.length)];
+    if (laneFocus >= 0 && shot.thread === 'lanes') {
+      const lane = LANE_POINTS[laneFocus];
+      nextPosition.lerp(laneCamera.copy(lane).add(LANE_APPROACH), 0.5);
+      nextTarget.lerp(lane, 0.55);
     }
 
     const amount = 1 - Math.exp(-SMOOTHING * delta);

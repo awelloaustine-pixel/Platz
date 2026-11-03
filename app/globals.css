@@ -48,13 +48,16 @@ html.lenis body {
 .chapter {
   position: relative;
   z-index: 10;
-  min-height: calc(var(--span) * 100vh);
-  min-height: calc(var(--span) * 100svh);
+}
+
+/* The height a chapter's text stays pinned for. Anything after it, like the footer, sits
+   below this track, so it cannot scroll up over the pinned text. */
+.chapter-track {
+  min-height: calc(min(var(--span), 1.25) * 100vh);
+  min-height: calc(min(var(--span), 1.25) * 100svh);
 }
 
 .chapter-stage {
-  position: sticky;
-  top: 0;
   display: flex;
   min-height: 100vh;
   min-height: 100svh;
@@ -64,7 +67,15 @@ html.lenis body {
 }
 
 @media (min-width: 64rem) {
+  .chapter-track {
+    min-height: calc(var(--span) * 100vh);
+    min-height: calc(var(--span) * 100svh);
+  }
+
+  /* Pinned only where everything fits on screen; phones scroll their content normally. */
   .chapter-stage {
+    position: sticky;
+    top: 0;
     padding: 6rem 2.5rem 2.5rem;
   }
 }
@@ -120,10 +131,13 @@ html.lenis body {
 }
 
 /* Standard property only: the compiler adds the Safari prefix, and writing both by hand
-   made it drop this one, which removed the blur in Chrome. */
+   made it drop this one, which removed the blur in Chrome.
+   The navy underlayer keeps white text at AA contrast when bright gold passes behind it. */
 .glass {
   border: 1px solid rgb(255 255 255 / 0.14);
-  background: rgb(255 255 255 / 0.06);
+  background:
+    linear-gradient(rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.06)),
+    rgb(2 6 23 / 0.58);
   backdrop-filter: blur(14px);
 }
 
@@ -228,5 +242,436 @@ html.lenis body {
 @media (max-width: 63.99rem) {
   .scene-shade {
     background: linear-gradient(to top, rgb(2 6 23 / 0.86), rgb(2 6 23 / 0.66) 48%, transparent 74%);
+  }
+}
+
+.headline-md {
+  font-size: clamp(2rem, 4.6vw, 4.25rem);
+  line-height: 1.04;
+}
+
+/* Text sits directly on a moving scene, so it carries its own soft dark edge. */
+.headline,
+.lede,
+.hud-text,
+.stats-bar,
+.chapter-stage a.text-link {
+  text-shadow:
+    0 1px 2px rgb(2 6 23 / 0.7),
+    0 0 18px rgb(2 6 23 / 0.75);
+}
+
+/* Letter by letter. Nothing here hides text unless the pre-paint script has run. */
+.split-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.split-char {
+  display: inline-block;
+}
+
+.js .reveal:not(.reveal-now) .split-char {
+  opacity: 0;
+  transform: translateY(0.35em);
+  filter: blur(6px);
+}
+
+.js .reveal.is-in:not(.reveal-now) .split-char {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  transition:
+    opacity 500ms ease,
+    transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 500ms ease;
+  transition-delay: calc(var(--i) * 16ms);
+}
+
+/* Body text: a mask wipes down over it, rather than a generic fade-up. */
+/* The mask goes on the children: a fully clipped element counts as off screen to the
+   IntersectionObserver watching it, so masking .reveal itself would never reveal anything. */
+.js .stage-body .reveal:not(.is-in, .reveal-now) > * {
+  clip-path: inset(0 0 100% 0);
+}
+
+.js .stage-body .reveal.is-in:not(.reveal-now) > * {
+  clip-path: inset(-30% -30% -30% -30%);
+  transition: clip-path 900ms cubic-bezier(0.2, 0.8, 0.2, 1) 180ms;
+}
+
+/* The first thing on a page reveals on CSS alone. Everything else waits to be scrolled to,
+   but this must not wait for JavaScript, which can take seconds on a slow phone. */
+.reveal-now .split-char {
+  animation: letter-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--loader-wait, 0ms) + var(--i) * 7ms);
+}
+
+.stage-body .reveal-now > * {
+  animation: wipe-in 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--loader-wait, 0ms) + 120ms);
+}
+
+/* Timed to appear as the desktop intro clears. */
+html.js:not(.seen) {
+  --loader-wait: 460ms;
+}
+
+@keyframes letter-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.3em);
+  }
+}
+
+@keyframes wipe-in {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(-30% -30% -30% -30%);
+  }
+}
+
+.stage-body {
+  margin-top: 1.25rem;
+}
+
+.glass-card {
+  border-radius: 1rem;
+  padding: 1.125rem 1.25rem;
+}
+
+.card-row {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.text-link {
+  color: var(--color-gold);
+  transition: color 200ms;
+}
+
+.text-link:hover {
+  color: #fff;
+}
+
+.how-steps {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.industry-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.industry-tile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.stats-bar {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 0.25rem 0.25rem 0.75rem;
+}
+
+.stats-bar > div {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+}
+
+.site-footer {
+  position: relative;
+  padding: 0 1.25rem 5.5rem;
+}
+
+.site-footer-inner {
+  display: grid;
+  gap: 1.5rem;
+  border-radius: 1.25rem;
+  background: rgb(2 6 23 / 0.82);
+  padding: 1.5rem;
+}
+
+.site-footer-base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-top: 1px solid rgb(255 255 255 / 0.14);
+  padding-top: 1rem;
+}
+
+@media (min-width: 40rem) {
+  .site-footer-inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .site-footer-base {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 64rem) {
+  .card-row,
+  .how-steps,
+  .stats-bar {
+    max-width: calc(100% - 13rem);
+  }
+
+  .card-row,
+  .how-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .stage-body-above {
+    order: -1;
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+  }
+
+  .site-footer {
+    padding: 0 2.5rem 2rem;
+  }
+
+  .site-footer-inner {
+    grid-template-columns: 1.6fr 1fr 1fr 1.6fr;
+    /* Clears the status panel and WhatsApp button fixed in the corner. */
+    max-width: calc(100% - 13rem);
+  }
+
+  /* With the 3D running, cards leave the page flow and attach to the scene. */
+  [data-anchors='on'] .card-row:has(.anchored) {
+    display: block;
+    max-width: none;
+  }
+
+  [data-anchors='on'] .industry-tiles {
+    display: block;
+  }
+
+  [data-anchors='on'] .anchored {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    transition: opacity 450ms ease;
+    will-change: transform;
+  }
+
+  [data-anchors='on'] .anchored.glass-card {
+    width: 19rem;
+    padding: 0.875rem 1rem;
+  }
+
+  [data-anchors='on'] .anchored:not([data-live='1']) {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 300ms ease,
+      visibility 0s linear 300ms;
+  }
+
+  /* One step at a time, matched to the gate the camera is passing. */
+  [data-anchors='on'] .how-steps {
+    grid-template-columns: minmax(0, 26rem);
+  }
+
+  [data-anchors='on'] .how-step {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition:
+      opacity 450ms ease,
+      transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  [data-anchors='on'] .how-step[data-current] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Buttons: the fill wipes in from the left. */
+.btn-gold,
+.btn-ghost {
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  transition:
+    background-size 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 250ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    color 200ms,
+    border-color 200ms;
+}
+
+.btn-gold {
+  background-image: linear-gradient(#f0cc63, #f0cc63);
+}
+
+.btn-gold:hover {
+  background-color: var(--color-gold);
+  background-size: 100% 100%;
+}
+
+.btn-ghost {
+  background-image: linear-gradient(var(--color-gold), var(--color-gold));
+}
+
+.btn-ghost:hover {
+  background-size: 100% 100%;
+  color: var(--color-ink);
+}
+
+.ring-cursor,
+.ring-cursor a,
+.ring-cursor button {
+  cursor: none;
+}
+
+.cursor-ring {
+  position: fixed;
+  top: -11px;
+  left: -11px;
+  z-index: 70;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgb(255 255 255 / 0.9);
+  border-radius: 50%;
+  mix-blend-mode: difference;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* First-visit intro on desktop. Fully CSS, gone in under a second, never blocks a click. */
+@property --loader-count {
+  syntax: '<integer>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: var(--color-ink);
+  pointer-events: none;
+  animation: loader-out 200ms ease 500ms forwards;
+}
+
+.seen .loader,
+html:not(.js) .loader {
+  display: none;
+}
+
+.loader-hub {
+  position: relative;
+  width: 9rem;
+  height: 9rem;
+}
+
+.loader-stone {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.875rem;
+  height: 0.75rem;
+  margin: -0.375rem 0 0 -0.4375rem;
+  border-radius: 45% 55% 40% 60%;
+  background: var(--color-gold);
+  transform: rotate(calc(var(--n) * 30deg)) translateY(-3.75rem);
+  animation: loader-stone 340ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--n) * 10ms);
+}
+
+@keyframes loader-stone {
+  from {
+    opacity: 0;
+    transform: rotate(calc(var(--n) * 30deg + 90deg)) translateY(-14rem);
+  }
+}
+
+.loader-count {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  counter-reset: loader var(--loader-count);
+  animation: loader-count 470ms ease-out forwards;
+}
+
+.loader-count::after {
+  content: counter(loader);
+}
+
+@keyframes loader-count {
+  to {
+    --loader-count: 100;
+  }
+}
+
+.loader-line {
+  overflow: hidden;
+  width: 0;
+  color: rgb(255 255 255 / 0.85);
+  white-space: nowrap;
+  animation: loader-type 420ms steps(40) 40ms forwards;
+}
+
+@keyframes loader-type {
+  to {
+    width: 41ch;
+  }
+}
+
+@keyframes loader-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-now .split-char,
+  .stage-body .reveal-now > * {
+    animation: none;
+  }
+
+  .js .reveal:not(.reveal-now) .split-char,
+  .js .reveal.is-in:not(.reveal-now) .split-char {
+    filter: none;
+    transform: none;
+    transition: opacity 300ms ease;
+    transition-delay: 0ms;
+  }
+
+  .js .stage-body .reveal:not(.is-in, .reveal-now) > * {
+    clip-path: none;
+    opacity: 0;
+  }
+
+  .js .stage-body .reveal.is-in:not(.reveal-now) > * {
+    clip-path: none;
+    opacity: 1;
+    transition: opacity 300ms ease;
   }
 }

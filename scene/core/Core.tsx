@@ -27,6 +27,8 @@ const DAMPING = 7.5;
 const dummy = new Object3D();
 const accentA = new Color();
 const accentB = new Color();
+const cameraLocal = new Vector3();
+const offset = new Vector3();
 
 interface Stone {
   variant: number;
@@ -81,7 +83,7 @@ export function Core({ pathname, tier }: { pathname: string; tier: Tier }) {
       return { geometry, count };
     });
   }, [stones, tier]);
-  const material = useMemo(() => createRockMaterial(tier === 'high' ? 3 : 2), [tier]);
+  const material = useMemo(() => createRockMaterial(2), []);
 
   const meshes = useRef<(InstancedMesh | null)[]>([]);
   const root = useRef<Group>(null);
@@ -95,7 +97,7 @@ export function Core({ pathname, tier }: { pathname: string; tier: Tier }) {
     color: new Color('#FFB52E'),
   });
 
-  useFrame((_, rawDelta) => {
+  useFrame(({ camera }, rawDelta) => {
     const delta = Math.min(rawDelta, 1 / 30);
     const state = sim.current;
     state.time += delta;
@@ -113,6 +115,8 @@ export function Core({ pathname, tier }: { pathname: string; tier: Tier }) {
     state.color.lerp(accentA, 1 - Math.exp(-3 * delta));
 
     const litStones = (lit / TOTAL_STONES) * stoneCount;
+    const clearing = sampleChapter(chapters, master.chapter, (chapter) => chapter.gates ?? 0);
+    if (root.current) root.current.worldToLocal(cameraLocal.copy(camera.position));
 
     stones.forEach((stone, index) => {
       const order = index / stoneCount;
@@ -132,6 +136,17 @@ export function Core({ pathname, tier }: { pathname: string; tier: Tier }) {
         MathUtils.lerp(stone.closed.y, ringY, open) + stone.away.y * scatter + Math.sin(time * 0.5 + stone.phase) * 0.14,
         MathUtils.lerp(stone.closed.z, stone.depth, open) + stone.away.z * scatter,
       );
+      // On the ride the stones part around the camera's line of sight to the centre.
+      if (clearing > 0.01) {
+        const lineLength = cameraLocal.lengthSq();
+        const along = lineLength > 0 ? MathUtils.clamp(dummy.position.dot(cameraLocal) / lineLength, 0, 1) : 0;
+        offset.copy(dummy.position).addScaledVector(cameraLocal, -along);
+        const distance = offset.length();
+        const needed = stone.scale * 1.9 + 0.8;
+        if (distance < needed && distance > 0.001) {
+          dummy.position.addScaledVector(offset, ((needed - distance) / distance) * clearing);
+        }
+      }
       dummy.quaternion.setFromAxisAngle(stone.axis, stone.phase + time * (stone.spin + damage * 0.35));
       dummy.scale.setScalar(stone.scale);
       dummy.updateMatrix();

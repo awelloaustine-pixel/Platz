@@ -6,6 +6,7 @@ import { lowerTier, parseTierOverride, resolveTier, type Tier, type TierPreferen
 import { readStored, writeStored } from './storage';
 
 const PREFERENCE_KEY = 'platinum.view';
+const FIRST_IMPRESSION_MS = 1200;
 
 /** `?quality=lite|medium|high` pins a tier for testing and disables automatic downgrades. */
 let override: Tier | null = null;
@@ -23,6 +24,17 @@ function applyTier(): void {
   document.documentElement.dataset.qualityReason = detectionReason;
 }
 
+/** Building the scene blocks the browser briefly, so it waits until the page is settled. */
+function afterFirstImpression(): Promise<void> {
+  const wait = Math.max(FIRST_IMPRESSION_MS - performance.now(), 0);
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if ('requestIdleCallback' in window) window.requestIdleCallback(() => resolve(), { timeout: 800 });
+      else resolve();
+    }, wait);
+  });
+}
+
 /** Runs after the page has loaded so that detection never competes with first paint. */
 export async function initQuality(): Promise<void> {
   if (started) return;
@@ -37,6 +49,8 @@ export async function initQuality(): Promise<void> {
   if (document.readyState !== 'complete') {
     await new Promise((resolve) => window.addEventListener('load', resolve, { once: true }));
   }
+
+  await afterFirstImpression();
 
   // Remembered Simple view needs no probing at all, and no GPU benchmark download.
   if (preference === 'simple' && !override) {

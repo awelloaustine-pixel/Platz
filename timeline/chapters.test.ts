@@ -56,9 +56,9 @@ test('a one-shot world has a rail parameter of zero', () => {
   assert.equal(railParameter(getWorld('/contact').chapters, 0), 0);
 });
 
-test('the active chapter changes at the halfway point and stays in range', () => {
-  assert.equal(activeChapterIndex(1.4, 7), 1);
-  assert.equal(activeChapterIndex(1.5, 7), 2);
+test('the active chapter changes as the next section arrives and stays in range', () => {
+  assert.equal(activeChapterIndex(1.7, 7), 1);
+  assert.equal(activeChapterIndex(1.75, 7), 2);
   assert.equal(activeChapterIndex(50, 7), 6);
 });
 

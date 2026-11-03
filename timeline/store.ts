@@ -38,6 +38,8 @@ export interface UiState {
   webgl: boolean;
   reducedMotion: boolean;
   soundOn: boolean;
+  /** The service card being hovered in What We Do, or -1. */
+  laneFocus: number;
 }
 
 const initialState: UiState = {
@@ -51,6 +53,7 @@ const initialState: UiState = {
   webgl: true,
   reducedMotion: false,
   soundOn: false,
+  laneFocus: -1,
 };
 
 let state = initialState;
