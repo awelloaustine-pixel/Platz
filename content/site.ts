@@ -6,13 +6,20 @@ export const site = {
   location: 'Nairobi, Kenya',
   // PLACEHOLDER — Victor to supply: final domain (.co.ke vs .com)
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://platinummarketingagency.co.ke',
-  // PLACEHOLDER — Victor to supply: WhatsApp Business number, digits only with country code
-  whatsappNumber: '254700000000',
-  // PLACEHOLDER — Victor to supply: business email and Kenya phone number
-  email: 'hello@platinummarketingagency.co.ke',
-  phone: '+254 700 000 000',
+  // Digits only, with the country code.
+  whatsappNumber: '254114939128',
+  email: 'helloplatinummarketing@gmail.com',
+  phone: '+254 114 939 128',
   // PLACEHOLDER — Victor to supply: links to the business's real social profiles
   sameAs: [] as string[],
+};
+
+/** Switch these on once the real content exists. */
+export const features = {
+  /** The Results chapter. Needs real numbers in stats.ts and real quotes in testimonials.ts. */
+  results: false,
+  /** The sound toggle. Needs an audio file and the Howler ambient bed. */
+  sound: false,
 };
 
 export const whatsappUrl = `https://wa.me/${site.whatsappNumber}`;

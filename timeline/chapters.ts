@@ -2,6 +2,7 @@
 // value (master.chapter) and sample these configs, which keeps them in lockstep.
 
 import { aiProblem as aiProblemLines, automationProblem as automationProblemLines } from '../content/services.ts';
+import { features } from '../content/site.ts';
 
 export type Vec3 = readonly [number, number, number];
 
@@ -68,7 +69,7 @@ const NAVY = '#020617';
 const automationProblem = automationProblemLines[0];
 const aiProblem = aiProblemLines[0];
 
-const home: readonly ChapterConfig[] = [
+const allHomeChapters: readonly ChapterConfig[] = [
   {
     id: 'arrival',
     label: 'Arrival',
@@ -176,6 +177,8 @@ const home: readonly ChapterConfig[] = [
     city: 0,
   },
 ];
+
+const home = allHomeChapters.filter((chapter) => chapter.id !== 'proof' || features.results);
 
 type InnerGrade = ChapterConfig['grade'];
 

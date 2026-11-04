@@ -110,22 +110,24 @@ Search the code for `PLACEHOLDER`.
 
 **Must be replaced before real customers see the site:**
 
-- [ ] Testimonials (`content/testimonials.ts`). Publishing invented reviews would mislead customers.
-- [ ] Results numbers (`content/stats.ts`)
-- [ ] WhatsApp number, phone and email (`content/site.ts`)
 - [ ] Google Sheet connection, or leads cannot be received
+
+**Hidden until the real content exists:**
+
+- [ ] Results chapter: add real quotes to `content/testimonials.ts` and real numbers to `content/stats.ts`, then set `features.results` to `true` in `content/site.ts`. Never publish invented reviews.
+- [ ] Sound toggle: needs an audio file and playback code, then `features.sound` in `content/site.ts`.
+- [ ] Team bios (`content/team.ts`): each one appears as soon as it is filled in.
 
 **Also to supply:**
 
 - [ ] Final domain (`.co.ke` or `.com`): `NEXT_PUBLIC_SITE_URL`
 - [ ] Logo (`public/logo.svg` and `app/icon.svg`), and brand colour confirmation (`app/globals.css`)
 - [ ] Calendly link
-- [ ] Team photos and one-line bios (`content/team.ts`)
+- [ ] Team photos (`content/team.ts`)
 - [ ] Social profile links (`sameAs` in `content/site.ts`)
 - [ ] Google Analytics ID or Plausible domain
 
 **Known gaps:**
 
-- The sound toggle saves a choice but plays nothing, because no audio file exists yet.
 - The site has not been tested on a real Android phone.
 - The chats on the 3D phone, some section headings, and the wording on the AI demo button are drafts to review.

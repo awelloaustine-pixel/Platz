@@ -58,7 +58,7 @@ export default function AboutPage() {
               </span>
               <h3 className="mt-3 text-lg font-light tracking-tight">{member.name}</h3>
               <p className="hud-text mt-1 text-gold">{member.role}</p>
-              <p className="mt-2 text-sm text-white/85">{member.bio}</p>
+              {member.bio && <p className="mt-2 text-sm text-white/85">{member.bio}</p>}
             </GlassCard>
           ))}
         </ul>

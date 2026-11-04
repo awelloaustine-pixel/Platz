@@ -1,9 +1,9 @@
 // PLACEHOLDER — Victor to supply team photos and one-line bios.
 export const team = [
-  { name: 'Victor Odhiambo', role: 'Founder & Strategy', bio: '[One-line bio goes here.]', photo: null },
-  { name: 'Austin', role: 'Operations Lead & Developer', bio: '[One-line bio goes here.]', photo: null },
-  { name: 'Samara', role: 'Developer & Social Media', bio: '[One-line bio goes here.]', photo: null },
-  { name: 'Ann', role: 'Lead Generation & Client Communications', bio: '[One-line bio goes here.]', photo: null },
+  { name: 'Victor Odhiambo', role: 'Founder & Strategy', bio: '', photo: null },
+  { name: 'Austin', role: 'Operations Lead & Developer', bio: '', photo: null },
+  { name: 'Samara', role: 'Developer & Social Media', bio: '', photo: null },
+  { name: 'Ann', role: 'Lead Generation & Client Communications', bio: '', photo: null },
 ] as const;
 
 export const story = [

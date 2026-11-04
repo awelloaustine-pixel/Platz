@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { features } from '../content/site.ts';
 import {
   activeChapterIndex,
   buildRail,
@@ -12,10 +13,11 @@ import {
   segment,
 } from './chapters.ts';
 
-test('home has the seven chapters of the storyboard', () => {
+test('home has the chapters of the storyboard, with Results only when switched on', () => {
+  const expected = ['arrival', 'problem', 'system', 'how', 'who', ...(features.results ? ['proof'] : []), 'begin'];
   assert.deepEqual(
     getWorld('/').chapters.map((chapter) => chapter.id),
-    ['arrival', 'problem', 'system', 'how', 'who', 'proof', 'begin'],
+    expected,
   );
 });
 

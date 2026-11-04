@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { site } from '@/content/site';
+import { features, site } from '@/content/site';
 import { formatChapter, getWorld } from '@/timeline/chapters';
 import { useUi } from '@/timeline/store';
 import { ChapterIndex } from './ChapterIndex';
@@ -43,9 +43,11 @@ export function Hud() {
 
         <div className="flex flex-col items-end gap-3 justify-self-end">
           <Nav />
-          <div className="hidden lg:block">
-            <SoundToggle />
-          </div>
+          {features.sound && (
+            <div className="hidden lg:block">
+              <SoundToggle />
+            </div>
+          )}
           <ChapterIndex />
         </div>
       </header>

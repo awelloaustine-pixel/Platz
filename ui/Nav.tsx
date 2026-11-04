@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { nav } from '@/content/site';
+import { features, nav } from '@/content/site';
 import { SoundToggle } from './SoundToggle';
 
 export function Nav() {
@@ -65,9 +65,11 @@ export function Nav() {
               ))}
             </ul>
           </nav>
-          <div className="mt-4 border-t border-white/15 pt-4">
-            <SoundToggle />
-          </div>
+          {features.sound && (
+            <div className="mt-4 border-t border-white/15 pt-4">
+              <SoundToggle />
+            </div>
+          )}
         </div>
       )}
     </>

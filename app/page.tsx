@@ -17,7 +17,10 @@ import { StepList } from '@/ui/StepList';
 export const metadata = pageMetadata('/');
 
 export default function HomePage() {
-  const [arrival, problem, system, how, who, proof, begin] = getWorld('/').chapters;
+  const { chapters } = getWorld('/');
+  const [arrival, problem, system, how, who] = chapters;
+  const proof = chapters.find((chapter) => chapter.id === 'proof');
+  const begin = chapters[chapters.length - 1];
 
   return (
     <>
@@ -75,7 +78,8 @@ export default function HomePage() {
         </ul>
       </ChapterSection>
 
-      <ChapterSection chapter={proof} index={5} bodyAbove>
+      {proof && (
+      <ChapterSection chapter={proof} index={chapters.indexOf(proof)} bodyAbove>
         <div className="reveal">
           <dl className="stats-bar">
             {stats.map((stat) => (
@@ -101,8 +105,9 @@ export default function HomePage() {
           </ul>
         </div>
       </ChapterSection>
+      )}
 
-      <ChapterSection chapter={begin} index={6} after={<SiteFooter />}>
+      <ChapterSection chapter={begin} index={chapters.indexOf(begin)} after={<SiteFooter />}>
         <div className="reveal">
           <p className="lede">{beginCopy.body}</p>
           <div className="mt-6 flex flex-wrap gap-3">
