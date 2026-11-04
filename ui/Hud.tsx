@@ -51,7 +51,9 @@ export function Hud() {
       </header>
 
       <ProgressRail />
-      <WhatsAppButton />
+      <aside aria-label="Contact us">
+        <WhatsAppButton />
+      </aside>
       <HudReadouts />
     </>
   );

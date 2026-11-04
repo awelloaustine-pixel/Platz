@@ -87,7 +87,7 @@ html.lenis body {
   inset: 0 0 auto;
   z-index: -1;
   height: 7rem;
-  background: linear-gradient(to bottom, rgb(2 6 23 / 0.6), transparent);
+  background: linear-gradient(to bottom, rgb(2 6 23 / 0.8), rgb(2 6 23 / 0.6) 55%, transparent);
 }
 
 /* Keeps text readable over a bright scene. Fixed to the viewport, not to a section,
@@ -137,7 +137,7 @@ html.lenis body {
   border: 1px solid rgb(255 255 255 / 0.14);
   background:
     linear-gradient(rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.06)),
-    rgb(2 6 23 / 0.58);
+    rgb(2 6 23 / 0.74);
   backdrop-filter: blur(14px);
 }
 
@@ -1163,5 +1163,47 @@ html[data-quality='lite'] .glass {
 @media (prefers-reduced-motion: reduce) {
   .poster {
     animation-duration: 200ms;
+  }
+}
+
+/* Text directly on the scene gets a soft dark backing, because a bright part of the scene
+   can pass behind it. An audit cannot see this: it was measured from real screenshots.
+   A blurred layer rather than a shadow, so that the backing has no visible edge. */
+.stats-bar {
+  position: relative;
+  isolation: isolate;
+}
+
+.stats-bar::before {
+  content: '';
+  position: absolute;
+  inset: -0.75rem;
+  z-index: -1;
+  border-radius: 1.5rem;
+  background: rgb(2 6 23 / 0.66);
+  filter: blur(14px);
+  pointer-events: none;
+}
+
+/* On phones, headings sit at the top of the screen, over the brightest part of the scene. */
+@media (max-width: 63.99rem) {
+  .chapter-stage > .reveal,
+  .story p {
+    position: relative;
+    isolation: isolate;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .chapter-stage > .reveal::before,
+  .story p::before {
+    content: '';
+    position: absolute;
+    inset: -1rem -1.25rem;
+    z-index: -1;
+    border-radius: 2rem;
+    background: rgb(2 6 23 / 0.66);
+    filter: blur(16px);
+    pointer-events: none;
   }
 }
