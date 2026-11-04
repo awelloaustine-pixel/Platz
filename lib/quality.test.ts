@@ -50,24 +50,17 @@ test('a desktop only gets high with a known, capable GPU', () => {
   assert.equal(decideTier({ ...desktop, deviceMemory: 3 }).tier, 'medium');
 });
 
-const base = { autoTier: 'high', preference: 'auto', runtimeCap: null, webgl: true, reducedMotion: false } as const;
+const base = { autoTier: 'high', runtimeCap: null, webgl: true, reducedMotion: false } as const;
 
-test('Simple view and reduced motion always win', () => {
-  assert.equal(resolveTier({ ...base, preference: 'simple' }), 'lite');
+test('reduced motion and missing WebGL always mean lite', () => {
   assert.equal(resolveTier({ ...base, reducedMotion: true }), 'lite');
-  assert.equal(resolveTier({ ...base, preference: 'full', reducedMotion: true }), 'lite');
+  assert.equal(resolveTier({ ...base, webgl: false }), 'lite');
 });
 
 test('the runtime cap lowers the tier but never raises it', () => {
   assert.equal(resolveTier({ ...base, runtimeCap: 'medium' }), 'medium');
   assert.equal(resolveTier({ ...base, autoTier: 'medium', runtimeCap: 'high' }), 'medium');
   assert.equal(resolveTier({ ...base, autoTier: 'medium', runtimeCap: 'lite' }), 'lite');
-});
-
-test('choosing full 3D lifts lite to medium unless WebGL is missing', () => {
-  assert.equal(resolveTier({ ...base, autoTier: 'lite', preference: 'full' }), 'medium');
-  assert.equal(resolveTier({ ...base, runtimeCap: 'lite', preference: 'full' }), 'medium');
-  assert.equal(resolveTier({ ...base, autoTier: 'lite', preference: 'full', webgl: false }), 'lite');
 });
 
 test('lowerTier stops at lite', () => {

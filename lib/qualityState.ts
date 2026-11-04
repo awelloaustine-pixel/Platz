@@ -2,10 +2,8 @@
 
 import { ui } from '@/timeline/store';
 import { detectQuality } from './detectQuality';
-import { lowerTier, parseTierOverride, resolveTier, type Tier, type TierPreference } from './quality';
-import { readStored, writeStored } from './storage';
+import { lowerTier, parseTierOverride, resolveTier, type Tier } from './quality';
 
-const PREFERENCE_KEY = 'platinum.view';
 const FIRST_IMPRESSION_MS = 1200;
 
 /** `?quality=lite|medium|high` pins a tier for testing and disables automatic downgrades. */
@@ -14,9 +12,9 @@ let started = false;
 let detectionReason = 'not-detected';
 
 function applyTier(): void {
-  const { autoTier, preference, runtimeCap, webgl, reducedMotion } = ui.get();
+  const { autoTier, runtimeCap, webgl, reducedMotion } = ui.get();
   if (!autoTier) return;
-  const resolved = resolveTier({ autoTier, preference, runtimeCap, webgl, reducedMotion });
+  const resolved = resolveTier({ autoTier, runtimeCap, webgl, reducedMotion });
   const tier = override && webgl ? override : resolved;
   ui.set({ tier });
   // Inspectable on a real phone: shows which tier was chosen and what detection found.
@@ -40,11 +38,8 @@ export async function initQuality(): Promise<void> {
   if (started) return;
   started = true;
 
-  const stored = readStored(PREFERENCE_KEY);
-  const preference: TierPreference = stored === 'simple' || stored === 'full' ? stored : 'auto';
   override = parseTierOverride(new URLSearchParams(window.location.search).get('quality'));
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  ui.set({ preference, reducedMotion });
+  ui.set({ reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches });
 
   if (document.readyState !== 'complete') {
     await new Promise((resolve) => window.addEventListener('load', resolve, { once: true }));
@@ -52,33 +47,9 @@ export async function initQuality(): Promise<void> {
 
   await afterFirstImpression();
 
-  // Remembered Simple view needs no probing at all, and no GPU benchmark download.
-  if (preference === 'simple' && !override) {
-    ui.set({ autoTier: 'lite' });
-    applyTier();
-    return;
-  }
-
   const detected = await detectQuality();
   detectionReason = detected.reason;
   ui.set({ autoTier: detected.autoTier, webgl: detected.webgl });
-  applyTier();
-}
-
-/** The HUD button: flips between the fast version and the 3D version of the same page. */
-export async function toggleSimpleView(): Promise<void> {
-  const leavingSimple = ui.get().tier === 'lite';
-  const preference: TierPreference = leavingSimple ? 'full' : 'simple';
-  writeStored(PREFERENCE_KEY, preference);
-  ui.set({ preference });
-  override = null;
-
-  // A visit that began in remembered Simple view skipped detection, so run it now.
-  if (leavingSimple && ui.get().autoTier === 'lite') {
-    const detected = await detectQuality();
-    detectionReason = detected.reason;
-    ui.set({ autoTier: detected.autoTier, webgl: detected.webgl });
-  }
   applyTier();
 }
 

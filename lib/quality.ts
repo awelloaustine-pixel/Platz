@@ -2,7 +2,6 @@
 // the browser probing lives in lib/detectQuality.ts.
 
 export type Tier = 'high' | 'medium' | 'lite';
-export type TierPreference = 'auto' | 'simple' | 'full';
 
 export interface QualitySignals {
   webgl: boolean;
@@ -50,20 +49,17 @@ function minTier(a: Tier, b: Tier): Tier {
 
 export interface ResolveInput {
   autoTier: Tier;
-  preference: TierPreference;
   /** Ceiling set when the running scene cannot hold its frame rate. */
   runtimeCap: Tier | null;
   webgl: boolean;
   reducedMotion: boolean;
 }
 
-/** Combines detection, the visitor's choice and runtime performance into the tier to render. */
-export function resolveTier({ autoTier, preference, runtimeCap, webgl, reducedMotion }: ResolveInput): Tier {
-  if (!webgl || reducedMotion || preference === 'simple') return 'lite';
+/** Combines detection and runtime performance into the tier to render. */
+export function resolveTier({ autoTier, runtimeCap, webgl, reducedMotion }: ResolveInput): Tier {
+  if (!webgl || reducedMotion) return 'lite';
 
-  const capped = runtimeCap ? minTier(autoTier, runtimeCap) : autoTier;
-  // A visitor who asked for 3D keeps it, at the lightest level that still renders it.
-  return preference === 'full' && capped === 'lite' ? 'medium' : capped;
+  return runtimeCap ? minTier(autoTier, runtimeCap) : autoTier;
 }
 
 export function parseTierOverride(value: string | null): Tier | null {

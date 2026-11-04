@@ -1,7 +1,7 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
-import type { Tier, TierPreference } from '@/lib/quality';
+import type { Tier } from '@/lib/quality';
 
 /**
  * The master value everything reads. Written once per frame by the scrubbed GSAP
@@ -33,7 +33,6 @@ export interface UiState {
   tier: Tier | null;
   autoTier: Tier | null;
   runtimeCap: Tier | null;
-  preference: TierPreference;
   webgl: boolean;
   reducedMotion: boolean;
   soundOn: boolean;
@@ -55,7 +54,6 @@ const initialState: UiState = {
   tier: null,
   autoTier: null,
   runtimeCap: null,
-  preference: 'auto',
   webgl: true,
   reducedMotion: false,
   soundOn: false,
