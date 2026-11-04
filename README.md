@@ -25,7 +25,9 @@ Add `?quality=lite`, `?quality=medium` or `?quality=high` to any address to pin 
 
 ## Deploy on Vercel
 
-Pushing to `main` deploys to production automatically, with Vercel detecting Next.js and no extra build settings needed.
+The site is live at https://platz-pi.vercel.app, in the `platz` project on the `platinum` Vercel team. `vercel.json` sets the framework, so no extra build settings are needed.
+
+**Pushes do not deploy automatically yet.** Vercel could not access the GitHub repository, so connect it under **Project > Settings > Git**. Once it is connected, pushing to `main` deploys to production. Until then, deploy by running `npx vercel deploy --prod` from this folder.
 
 Set these in **Vercel > Project > Settings > Environment Variables**, then redeploy. `.env.example` lists them all.
 
