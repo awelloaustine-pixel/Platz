@@ -15,6 +15,7 @@ import { Effects } from './effects/Effects';
 import { GradeRig } from './effects/GradeRig';
 import { Gates } from './thread/Gates';
 import { Thread } from './thread/Thread';
+import { Worlds } from './worlds/Worlds';
 
 /** Soft fill so the far sides of the rocks hold some shape instead of falling to black. */
 function Studio() {
@@ -66,6 +67,7 @@ export function Experience({ pathname, tier }: { pathname: string; tier: Tier })
         <Core key={tier} pathname={pathname} tier={tier} />
         <Thread pathname={pathname} tier={tier} />
         <Gates pathname={pathname} />
+        <Worlds pathname={pathname} tier={tier} />
       </PointerTilt>
       <Effects tier={tier} />
     </>

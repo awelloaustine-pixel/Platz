@@ -1,17 +1,17 @@
 import Link from 'next/link';
-import { beginCopy, heroCopy, industries, problemPoints, TAGLINES, taglineVariant } from '@/content/copy';
+import { beginCopy, heroCopy, howSteps, industries, problemPoints, TAGLINES, taglineVariant } from '@/content/copy';
 import { whatsappUrl } from '@/content/site';
 import { stats } from '@/content/stats';
 import { testimonials } from '@/content/testimonials';
 import { getWorld } from '@/timeline/chapters';
 import { ChapterSection } from '@/ui/ChapterSection';
 import { GlassCard } from '@/ui/GlassCard';
-import { HowSteps } from '@/ui/HowSteps';
 import { Icon } from '@/ui/Icon';
 import { SectionLink } from '@/ui/SectionLink';
 import { ServiceCards } from '@/ui/ServiceCards';
 import { SiteFooter } from '@/ui/SiteFooter';
 import { StatCounter } from '@/ui/StatCounter';
+import { StepList } from '@/ui/StepList';
 
 export default function HomePage() {
   const [arrival, problem, system, how, who, proof, begin] = getWorld('/').chapters;
@@ -56,7 +56,7 @@ export default function HomePage() {
       </ChapterSection>
 
       <ChapterSection chapter={how} index={3} bodyAbove>
-        <HowSteps />
+        <StepList items={howSteps} chapterIndex={3} />
       </ChapterSection>
 
       <ChapterSection chapter={who} index={4}>

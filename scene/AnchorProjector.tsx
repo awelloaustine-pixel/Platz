@@ -21,6 +21,7 @@ interface Tracked {
   chapter: number;
   splinter: number | null;
   orbit: { index: number; total: number } | null;
+  point: Vector3 | null;
   x: number;
   y: number;
 }
@@ -33,15 +34,17 @@ function clearAnchors(items: readonly Tracked[]): void {
 }
 
 function scan(): Tracked[] {
-  const found = document.querySelectorAll<HTMLElement>('[data-anchor], [data-orbit]');
+  const found = document.querySelectorAll<HTMLElement>('[data-anchor], [data-orbit], [data-point]');
   return Array.from(found).map((element) => {
     const [index, total] = (element.dataset.orbit ?? '').split('/').map(Number);
     const splinter = element.dataset.anchor?.match(/^splinter-(\d)$/)?.[1];
+    const coordinates = element.dataset.point?.split(',').map(Number);
     return {
       element,
       chapter: Number(element.closest<HTMLElement>('[data-chapter]')?.dataset.chapter ?? -1),
       splinter: splinter === undefined ? null : Number(splinter),
       orbit: element.dataset.orbit ? { index, total } : null,
+      point: coordinates ? new Vector3(coordinates[0], coordinates[1], coordinates[2]) : null,
       x: 0,
       y: 0,
     };
@@ -117,7 +120,10 @@ export function AnchorProjector({ pathname }: { pathname: string }) {
       if (live !== (item.element.dataset.live === '1')) item.element.dataset.live = live ? '1' : '0';
       if (!live) return;
 
-      if (item.orbit) {
+      if (item.point) {
+        const spot = toScreen(item.point);
+        item.element.style.transform = `translate(${spot.x}px, ${spot.y}px) translate(-50%, -50%)`;
+      } else if (item.orbit) {
         const angle = (item.orbit.index / item.orbit.total) * Math.PI * 2 + orbitTime.current;
         const depth = 0.9 + Math.sin(angle) * 0.1;
         const box = item.element.offsetWidth;

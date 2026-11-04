@@ -675,3 +675,310 @@ html:not(.js) .loader {
     transition: opacity 300ms ease;
   }
 }
+
+/* Long sentences used as a section's main statement. */
+.headline-statement {
+  max-width: min(100%, 56rem);
+  font-size: clamp(1.625rem, 3.2vw, 3rem);
+  line-height: 1.12;
+}
+
+.statement-follow {
+  max-width: 50rem;
+  color: var(--color-gold);
+  font-size: clamp(1.25rem, 2.1vw, 2rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-shadow: 0 0 18px rgb(2 6 23 / 0.75);
+}
+
+/* Long lines should not spend seconds arriving. */
+.headline-statement .split-char,
+.statement-follow .split-char {
+  transition-delay: calc(var(--i) * 5ms) !important;
+}
+
+.step-list-all {
+  display: grid;
+  gap: 0.375rem;
+  max-width: 34rem;
+}
+
+.step-all {
+  display: flex;
+  gap: 0.875rem;
+  padding: 0.625rem 1rem;
+  transition:
+    border-color 300ms ease,
+    transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.step-all[data-current] {
+  border-color: var(--color-gold);
+  transform: translateX(0.5rem);
+}
+
+.tier-card {
+  cursor: default;
+}
+
+.tier-card:focus-visible {
+  outline-offset: 2px;
+}
+
+.tier-prices {
+  display: grid;
+  gap: 0.625rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0.875rem;
+}
+
+.tier-prices dd {
+  white-space: nowrap;
+  font-size: clamp(1rem, 1.3vw, 1.25rem);
+}
+
+.price-note {
+  max-width: 52rem;
+  margin-top: 0.75rem;
+  color: rgb(255 255 255 / 0.85);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  text-shadow: 0 0 14px rgb(2 6 23 / 0.8);
+}
+
+.tier-stack {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tier-stack .tier-card {
+  padding: 0.75rem 0.875rem;
+}
+
+.tier-stack .tier-prices dd {
+  font-size: 1rem;
+}
+
+.lane-columns {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.lane-column {
+  transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.bundle-banner {
+  max-width: 44rem;
+  border-color: var(--color-gold);
+}
+
+.faq-list {
+  display: grid;
+  gap: 0.375rem;
+  max-width: 44rem;
+}
+
+.faq-item {
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.faq-item p {
+  margin-top: 0.5rem;
+  color: rgb(255 255 255 / 0.85);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.oracle-demo {
+  max-width: 34rem;
+}
+
+.oracle-fields {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.oracle-fields label {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.oracle-fields select {
+  min-height: 2.75rem;
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: 0.5rem;
+  background: var(--color-ink);
+  color: #fff;
+  padding: 0 0.625rem;
+}
+
+.oracle-question {
+  margin-top: 0.875rem;
+  color: var(--color-gold);
+  font-size: 1.25rem;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.oracle-demo .btn-gold {
+  display: inline-flex;
+}
+
+.story {
+  display: grid;
+  gap: 0.875rem;
+  max-width: 46rem;
+}
+
+.story p {
+  font-size: clamp(1rem, 1.3vw, 1.1875rem);
+  line-height: 1.5;
+  text-shadow: 0 1px 2px rgb(2 6 23 / 0.7), 0 0 18px rgb(2 6 23 / 0.8);
+}
+
+.team-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.team-avatar {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border: 1px solid var(--color-gold);
+  border-radius: 50%;
+  color: var(--color-gold);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.contact-details {
+  display: grid;
+  gap: 0.375rem;
+  max-width: 28rem;
+  margin-top: 1.25rem;
+}
+
+/* Words floating in the 3D. Only exist when the scene is there to float them in. */
+.scene-label {
+  display: none;
+}
+
+.route-leaving main {
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+@media (min-width: 40rem) {
+  .team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .team-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: calc(100% - 13rem);
+  }
+
+  .lane-columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    max-width: calc(100% - 13rem);
+  }
+
+  .lane-column:hover,
+  .lane-column:focus-within {
+    position: relative;
+    z-index: 2;
+    transform: scale(1.025);
+  }
+
+  [data-anchors='on'] .scene-label {
+    display: inline-block;
+    color: rgb(255 255 255 / 0.9);
+    font-size: 0.875rem;
+    pointer-events: none;
+    text-shadow: 0 0 12px rgb(2 6 23 / 0.9);
+    white-space: nowrap;
+  }
+
+  [data-anchors='on'] .drifting-question {
+    font-style: italic;
+    opacity: 0.8;
+  }
+
+  [data-anchors='on'] .pin-label,
+  [data-anchors='on'] .node-label {
+    color: var(--color-gold);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+  }
+
+  /* On the desktop 3D, the question appears inside the orb rather than the card. */
+  [data-anchors='on'] .oracle-question.anchored {
+    width: 17rem;
+    margin: 0;
+    font-size: 1.375rem;
+    pointer-events: none;
+    text-align: center;
+    text-shadow: 0 0 14px rgb(2 6 23 / 0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-leaving main {
+    opacity: 1;
+    transition: none;
+  }
+
+  .lane-column:hover,
+  .lane-column:focus-within {
+    transform: none;
+  }
+}
+
+@media (min-width: 64rem) {
+  [data-anchors='on'] .orb-question {
+    width: 17rem;
+    color: #fff;
+    font-size: 1.375rem;
+    font-weight: 300;
+    text-align: center;
+    white-space: normal;
+  }
+
+  /* The questions drift toward the orb. */
+  [data-anchors='on'] .drifting-question > span {
+    display: inline-block;
+    animation: question-drift 9s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes question-drift {
+  from {
+    transform: translate(10px, -6px);
+  }
+  to {
+    transform: translate(-16px, 8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-anchors='on'] .drifting-question > span {
+    animation: none;
+  }
+}

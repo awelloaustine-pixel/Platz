@@ -1,6 +1,8 @@
 // The single source of truth. The 3D scene and the DOM both read the same scroll
 // value (master.chapter) and sample these configs, which keeps them in lockstep.
 
+import { aiProblem as aiProblemLines, automationProblem as automationProblemLines } from '../content/services.ts';
+
 export type Vec3 = readonly [number, number, number];
 
 export type ThreadState =
@@ -11,7 +13,13 @@ export type ThreadState =
   | 'orbit'
   | 'flowing'
   | 'loop'
-  | 'resting';
+  | 'resting'
+  | 'blueprint'
+  | 'silent'
+  | 'answer'
+  | 'parallel'
+  | 'merged'
+  | 'team';
 
 export interface ChapterConfig {
   id: string;
@@ -33,6 +41,10 @@ export interface ChapterConfig {
   gates?: number;
   /** 0 opts out of the portrait phone framing adjustment. Defaults to 1. */
   framing?: number;
+  /** Size and place of the Core in this shot. Defaults to full size at the centre. */
+  core?: { scale: number; position: Vec3 };
+  /** Hovering a pricing tier lights 4, 8 or 12 stones of the Core. */
+  tierLit?: boolean;
   /** glow = how strongly the accent colour fills the space around the Core. */
   grade: { background: string; fog: string; fogDensity: number; accent: string; glow: number };
   thread: ThreadState;
@@ -54,6 +66,9 @@ const HOT_GOLD = '#FFB52E';
 const RED = '#FF2A1F';
 const WHATSAPP = '#25D366';
 const NAVY = '#020617';
+
+const automationProblem = automationProblemLines[0];
+const aiProblem = aiProblemLines[0];
 
 const home: readonly ChapterConfig[] = [
   {
@@ -171,83 +186,147 @@ const home: readonly ChapterConfig[] = [
   },
 ];
 
-type HeroShot = Pick<ChapterConfig, 'camera' | 'grade' | 'lit' | 'spread' | 'thread'>;
+type InnerGrade = ChapterConfig['grade'];
 
-function hero(id: string, title: string, shot: HeroShot): ChapterConfig {
-  return { id, label: 'Overview', title, span: 1, leads: 0, damage: 0, flare: 0.8, city: 0, ...shot };
+/** One shot of an inner page. Everything not given takes a quiet default. */
+function shot(
+  id: string,
+  label: string,
+  title: string,
+  span: number,
+  camera: ChapterConfig['camera'],
+  grade: InnerGrade,
+  rest: Partial<ChapterConfig> = {},
+): ChapterConfig {
+  return {
+    id,
+    label,
+    title,
+    span,
+    camera,
+    grade,
+    lit: 0,
+    spread: 1,
+    damage: 0,
+    thread: 'resting',
+    flare: 0,
+    city: 0,
+    leads: 0,
+    ...rest,
+  };
 }
+
+const NO_CORE: ChapterConfig['core'] = { scale: 0, position: [0, 0, 0] };
+
+const BLUEPRINT_GRADE: InnerGrade = { background: '#020818', fog: '#071028', fogDensity: 0.012, accent: HOT_GOLD, glow: 0.3 };
+const SIGNAL_GRADE: InnerGrade = { background: '#010e07', fog: '#031c0f', fogDensity: 0.012, accent: WHATSAPP, glow: 0.42 };
+const ORACLE_GRADE: InnerGrade = { background: '#0a0318', fog: '#150828', fogDensity: 0.016, accent: '#9B5CFF', glow: 0.5 };
+const LANES_GRADE: InnerGrade = { background: '#080501', fog: '#120b02', fogDensity: 0.01, accent: HOT_GOLD, glow: 0.3 };
+const TEAM_GRADE: InnerGrade = { background: '#02061a', fog: '#080d28', fogDensity: 0.012, accent: '#FFC23D', glow: 0.4 };
+const LANDING_GRADE: InnerGrade = { background: NAVY, fog: '#070b18', fogDensity: 0.008, accent: GOLD, glow: 0.2 };
 
 const worlds: Record<string, World> = {
   '/': { name: 'The Platinum Thread', chapters: home },
   '/websites': {
     name: 'The Blueprint',
     chapters: [
-      hero('hero', 'A Website That Actually Works For Your Business', {
-        camera: { position: [-6, 2, 10.5], target: [-1.8, 0, 0], fov: 40 },
-        grade: { background: '#020818', fog: '#071028', fogDensity: 0.016, accent: '#FFB52E', glow: 0.5 },
-        lit: 4,
-        spread: 0.7,
-        thread: 'riding',
+      shot('hero', 'Overview', 'A Website That Actually Works For Your Business', 1.2, { position: [-2.6, 0.6, 14], target: [-2.6, 0.2, 0], fov: 36 }, BLUEPRINT_GRADE, {
+        thread: 'blueprint',
+        core: NO_CORE,
+      }),
+      shot('features', 'What You Get', 'What You Get', 2.8, { position: [1.6, 0.4, 10.5], target: [-0.9, 0, 0], fov: 38 }, BLUEPRINT_GRADE, {
+        thread: 'blueprint',
+        core: NO_CORE,
+      }),
+      shot('pricing', 'Pricing', 'Pricing', 1.3, { position: [-1, 3.2, 17], target: [-0.8, 2.2, 0], fov: 36 }, BLUEPRINT_GRADE, {
+        thread: 'blueprint',
+        tierLit: true,
+        core: { scale: 0.32, position: [1.6, 4.6, 0] },
+      }),
+      shot('faq', 'FAQ', 'FAQ', 1.2, { position: [-3.4, 0.4, 13], target: [-3, 0.4, 0], fov: 36 }, BLUEPRINT_GRADE, {
+        thread: 'blueprint',
+        core: NO_CORE,
       }),
     ],
   },
   '/automations': {
     name: 'The Signal Network',
     chapters: [
-      hero('hero', 'Your Business, Running on Autopilot', {
-        camera: { position: [6, -1, 10], target: [-2, 0, 0], fov: 40 },
-        grade: { background: '#010e07', fog: '#031c0f', fogDensity: 0.02, accent: WHATSAPP, glow: 0.8 },
-        lit: 8,
-        spread: 0.85,
-        thread: 'flowing',
-      }),
+      shot('hero', 'Overview', 'Your Business, Running on Autopilot', 1.2, { position: [-2.4, -0.2, 15], target: [-3.2, 0, 0], fov: 38 }, SIGNAL_GRADE, { core: NO_CORE, thread: 'silent' }),
+      shot('problem', 'The Problem', automationProblem, 1.5, { position: [3, 1.2, 13], target: [-3.4, 0.6, 0], fov: 38 }, SIGNAL_GRADE, { core: NO_CORE, thread: 'silent' }),
+      shot('network', 'The 7 Stations', 'The 7 Stations', 4, { position: [-2.2, 1.2, 15], target: [-3.4, 0.8, 0], fov: 38 }, SIGNAL_GRADE, { core: NO_CORE, thread: 'silent' }),
+      shot('pricing', 'Pricing', 'Pricing', 1.3, { position: [0, 3.4, 19], target: [-0.6, 3.4, 0], fov: 36 }, SIGNAL_GRADE, { core: NO_CORE, thread: 'silent' }),
+      shot('faq', 'FAQ', 'FAQ', 1.2, { position: [-4, -0.4, 15], target: [-4, 0, 0], fov: 38 }, SIGNAL_GRADE, { core: NO_CORE, thread: 'silent' }),
     ],
   },
   '/ai-visibility': {
     name: 'The Oracle',
     chapters: [
-      hero('hero', 'When Customers Ask AI, Your Business Should Be the Answer', {
-        camera: { position: [-1, -4, 11], target: [-2.2, 0.6, 0], fov: 42 },
-        grade: { background: '#0a0318', fog: '#150828', fogDensity: 0.018, accent: '#9B5CFF', glow: 0.8 },
-        lit: 6,
-        spread: 0.75,
-        thread: 'crossing',
-      }),
+      shot('hero', 'Overview', 'When Customers Ask AI, Your Business Should Be the Answer', 1.2, { position: [-1.8, -0.3, 12], target: [-1.8, 0.1, 0], fov: 42 }, ORACLE_GRADE, { core: NO_CORE, thread: 'answer' }),
+      shot('problem', 'The Problem', aiProblem, 1.5, { position: [2.2, 0.2, 10], target: [-2.2, 0.2, 0], fov: 42 }, ORACLE_GRADE, { core: NO_CORE, thread: 'answer' }),
+      shot('demo', 'Try It Yourself', 'Try It Yourself', 1.5, { position: [-3, 0.6, 10], target: [-1.8, 0.2, 0], fov: 40 }, ORACLE_GRADE, { core: NO_CORE, thread: 'answer' }),
+      shot('steps', 'What We Do', 'What We Do', 3.6, { position: [2.6, -0.4, 10], target: [-1.6, 0.8, 0], fov: 42 }, ORACLE_GRADE, { core: NO_CORE, thread: 'answer' }),
+      shot('pricing', 'Pricing', 'Pricing', 1.3, { position: [0, 2.4, 14], target: [0, 1.8, 0], fov: 40 }, ORACLE_GRADE, { core: NO_CORE, thread: 'answer' }),
     ],
   },
   '/pricing': {
     name: 'The Three Lanes',
     chapters: [
-      hero('hero', 'Simple, Transparent Pricing', {
-        camera: { position: [0, 4, 13], target: [-1.5, 0, 0], fov: 35 },
-        grade: { background: '#080501', fog: '#120b02', fogDensity: 0.012, accent: HOT_GOLD, glow: 0.55 },
-        lit: 8,
-        spread: 0.9,
-        thread: 'lanes',
+      shot('hero', 'Overview', 'Simple, Transparent Pricing', 1.2, { position: [0, 3, 13], target: [0, 0, -8], fov: 36 }, LANES_GRADE, {
+        thread: 'parallel',
+        lit: 12,
+        core: { scale: 0.45, position: [0, 0, -30] },
+      }),
+      shot('lanes', 'The Three Lanes', 'The Three Lanes', 1.2, { position: [0, 1.8, 15], target: [0, 1.6, -8], fov: 34 }, LANES_GRADE, {
+        thread: 'parallel',
+        lit: 12,
+        core: { scale: 0.45, position: [0, 0, -30] },
+      }),
+      shot('bundle', 'Bundle', 'Bundle and Save', 1.3, { position: [-1, 3, 12], target: [-2.6, 0.5, -10], fov: 38 }, LANES_GRADE, {
+        thread: 'merged',
+        lit: 12,
+        flare: 0.7,
+        core: { scale: 0.45, position: [0, 0, -30] },
       }),
     ],
   },
   '/about': {
     name: 'The Team Constellation',
     chapters: [
-      hero('hero', 'We Help Kenyan Businesses Win Online', {
-        camera: { position: [4, 4, 13], target: [-2.2, 0, 0], fov: 36 },
-        grade: { background: '#02061a', fog: '#080d28', fogDensity: 0.012, accent: '#FFC23D', glow: 0.55 },
+      shot('hero', 'Overview', 'We Help Kenyan Businesses Win Online', 1.2, { position: [2.6, 1.6, 13], target: [-2.4, 0, 0], fov: 36 }, TEAM_GRADE, {
+        thread: 'team',
         lit: 12,
-        spread: 1,
-        thread: 'orbit',
+        flare: 0.6,
+        core: { scale: 0.5, position: [0, 0, 0] },
+      }),
+      shot('story', 'Our Story', 'Our Story', 1.6, { position: [-3, 0.4, 12], target: [-3, 0, 0], fov: 38 }, TEAM_GRADE, {
+        thread: 'team',
+        lit: 12,
+        flare: 0.6,
+        core: { scale: 0.5, position: [0, 0, 0] },
+      }),
+      shot('team', 'The Team', 'The Team', 1.3, { position: [0, 2.6, 14], target: [0, 2.2, 0], fov: 38 }, TEAM_GRADE, {
+        thread: 'team',
+        lit: 12,
+        flare: 0.6,
+        core: { scale: 0.5, position: [0, 0, 0] },
+      }),
+      shot('values', 'Our Values', 'Our Values', 2, { position: [2.4, -1.4, 11], target: [-2.2, 0, 0], fov: 38 }, TEAM_GRADE, {
+        thread: 'team',
+        lit: 3,
+        flare: 0.6,
+        core: { scale: 0.5, position: [0, 0, 0] },
       }),
     ],
   },
   '/contact': {
     name: 'Landing',
     chapters: [
-      hero('hero', "Let's Talk About Your Business", {
-        camera: { position: [-1, 0.5, 18], target: [-3, 0, 0], fov: 30 },
-        grade: { background: NAVY, fog: '#070b18', fogDensity: 0.008, accent: GOLD, glow: 0.3 },
-        lit: 12,
-        spread: 1,
+      shot('hero', 'Overview', "Let's Talk About Your Business", 1, { position: [-1, 0.5, 18], target: [-3, 0, 0], fov: 30 }, LANDING_GRADE, {
         thread: 'resting',
+        lit: 12,
+        flare: 0.4,
+        core: { scale: 0.65, position: [0, 0, 0] },
       }),
     ],
   },

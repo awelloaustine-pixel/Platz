@@ -40,6 +40,12 @@ export interface UiState {
   soundOn: boolean;
   /** The service card being hovered in What We Do, or -1. */
   laneFocus: number;
+  /** The pricing tier being hovered (0-2), or -1. */
+  tierLevel: number;
+  /** The item a StepList is on, which its world lights to match. */
+  worldFocus: number;
+  /** The Oracle demo's current question, echoed inside the orb. */
+  oracleQuestion: string;
 }
 
 const initialState: UiState = {
@@ -54,6 +60,9 @@ const initialState: UiState = {
   reducedMotion: false,
   soundOn: false,
   laneFocus: -1,
+  tierLevel: -1,
+  worldFocus: 0,
+  oracleQuestion: '',
 };
 
 let state = initialState;

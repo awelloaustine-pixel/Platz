@@ -8,7 +8,8 @@ import { Vector2 } from 'three';
 import type { Tier } from '@/lib/quality';
 import { master } from '@/timeline/store';
 
-const RESTING_OFFSET = 0.00035;
+const RESTING_OFFSET = 0.00025;
+const FLASH_PER_SPEED = 0.9;
 const TRANSITION_OFFSET = 0.0014;
 
 /**
@@ -19,11 +20,16 @@ export function Effects({ tier }: { tier: Tier }) {
   const aberration = useRef<ChromaticAberrationEffect>(null);
   const offset = useMemo(() => new Vector2(RESTING_OFFSET, RESTING_OFFSET), []);
 
-  useFrame(() => {
+  const motion = useRef({ last: 0, flash: 0 });
+
+  useFrame((_, delta) => {
     if (!aberration.current) return;
-    // Strongest halfway between two chapters: the brief flash at each boundary.
-    const between = 1 - Math.abs((master.chapter % 1) * 2 - 1);
-    const value = RESTING_OFFSET + Math.pow(between, 3) * TRANSITION_OFFSET;
+    const state = motion.current;
+    // A flash while moving quickly between chapters, gone the moment scrolling stops.
+    const speed = Math.abs(master.chapter - state.last) / Math.max(delta, 0.001);
+    state.last = master.chapter;
+    state.flash += (Math.min(speed * FLASH_PER_SPEED, 1) - state.flash) * (1 - Math.exp(-6 * delta));
+    const value = RESTING_OFFSET + state.flash * TRANSITION_OFFSET;
     aberration.current.offset.set(value, value);
   });
 

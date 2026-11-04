@@ -14,8 +14,8 @@ import {
 } from 'three';
 import type { Tier } from '@/lib/quality';
 import { seededRandom } from '@/lib/random';
-import { getWorld, sampleChapter, segment } from '@/timeline/chapters';
-import { master } from '@/timeline/store';
+import { activeChapterIndex, getWorld, sampleChapter, segment } from '@/timeline/chapters';
+import { master, ui } from '@/timeline/store';
 import { createRockGeometry } from './rockGeometry';
 import { createRockMaterial } from './rockMaterial';
 
@@ -27,6 +27,7 @@ const DAMPING = 7.5;
 const dummy = new Object3D();
 const accentA = new Color();
 const accentB = new Color();
+const corePlace = new Vector3();
 const cameraLocal = new Vector3();
 const offset = new Vector3();
 
@@ -87,6 +88,7 @@ export function Core({ pathname, tier }: { pathname: string; tier: Tier }) {
 
   const meshes = useRef<(InstancedMesh | null)[]>([]);
   const root = useRef<Group>(null);
+  const holder = useRef<Group>(null);
   const light = useRef<PointLight>(null);
   const sim = useRef({
     spread: new Float32Array(stoneCount),
@@ -105,7 +107,26 @@ export function Core({ pathname, tier }: { pathname: string; tier: Tier }) {
 
     const chapters = getWorld(pathname).chapters;
     const spread = sampleChapter(chapters, master.chapter, (chapter) => chapter.spread);
-    const lit = sampleChapter(chapters, master.chapter, (chapter) => chapter.lit);
+    const shot = chapters[activeChapterIndex(master.chapter, chapters.length)];
+    const { tierLevel } = ui.get();
+    const lit =
+      shot.tierLit && tierLevel >= 0
+        ? (tierLevel + 1) * 4
+        : sampleChapter(chapters, master.chapter, (chapter) => chapter.lit);
+    if (holder.current) {
+      const blendRate = 1 - Math.exp(-3.5 * delta);
+      const scale = sampleChapter(chapters, master.chapter, (chapter) => chapter.core?.scale ?? 1);
+      holder.current.scale.setScalar(MathUtils.lerp(holder.current.scale.x, Math.max(scale, 0.001), blendRate));
+      holder.current.visible = holder.current.scale.x > 0.02;
+      holder.current.position.lerp(
+        corePlace.set(
+          sampleChapter(chapters, master.chapter, (chapter) => chapter.core?.position[0] ?? 0),
+          sampleChapter(chapters, master.chapter, (chapter) => chapter.core?.position[1] ?? 0),
+          sampleChapter(chapters, master.chapter, (chapter) => chapter.core?.position[2] ?? 0),
+        ),
+        blendRate,
+      );
+    }
     const damageTarget = sampleChapter(chapters, master.chapter, (chapter) => chapter.damage);
     state.damage = MathUtils.damp(state.damage, damageTarget, 3, delta);
     const { damage } = state;
@@ -184,6 +205,7 @@ export function Core({ pathname, tier }: { pathname: string; tier: Tier }) {
   });
 
   return (
+    <group ref={holder}>
     <group ref={root}>
       <pointLight ref={light} position={[0, 0, 0.8]} distance={32} decay={1.7} />
       {variants.map((variant, index) => (
@@ -196,6 +218,7 @@ export function Core({ pathname, tier }: { pathname: string; tier: Tier }) {
           frustumCulled={false}
         />
       ))}
+    </group>
     </group>
   );
 }

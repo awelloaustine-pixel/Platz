@@ -10,6 +10,8 @@ interface ChapterSectionProps {
   eyebrow?: string;
   /** Hero sizing. Other chapters use a smaller headline to leave room for their content. */
   large?: boolean;
+  /** For a long sentence used as the section's headline. */
+  statement?: boolean;
   /** On large screens, shows children above the headline rather than below it. */
   bodyAbove?: boolean;
   /** Rendered after the pinned stage, in normal flow. */
@@ -25,6 +27,7 @@ export function ChapterSection({
   showLabel = true,
   eyebrow,
   large = false,
+  statement = false,
   bodyAbove = false,
   after,
   children,
@@ -47,7 +50,7 @@ export function ChapterSection({
                 {formatChapter(index)} —— {chapter.label}
               </p>
             )}
-            <Heading id={headingId} className={large ? 'headline' : 'headline headline-md'}>
+            <Heading id={headingId} className={large ? 'headline' : statement ? 'headline headline-statement' : 'headline headline-md'}>
               <SplitReveal text={chapter.title} />
             </Heading>
           </div>

@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { footerLinks, site } from '@/content/site';
 import { SectionLink } from './SectionLink';
 
-export function SiteFooter() {
+/** top is the id of the page's first section, where Begin again leads. */
+export function SiteFooter({ top = 'arrival' }: { top?: string }) {
   return (
     <footer className="site-footer">
       <div className="glass site-footer-inner">
@@ -44,7 +45,7 @@ export function SiteFooter() {
 
         <div className="site-footer-base">
           <p className="hud-text text-white/80">© 2026 {site.name}</p>
-          <SectionLink id="arrival" className="text-link hud-text inline-block py-1">
+          <SectionLink id={top} className="text-link hud-text inline-block py-1">
             Begin again ↑
           </SectionLink>
         </div>
