@@ -3,10 +3,13 @@ import { Inter_Tight, JetBrains_Mono } from 'next/font/google';
 import type { ReactNode } from 'react';
 import { site } from '@/content/site';
 import { SceneMount } from '@/scene/SceneMount';
+import { localBusinessSchema, organizationSchema } from '@/lib/schema';
+import { Analytics } from '@/ui/Analytics';
 import { AppRuntime } from '@/ui/AppRuntime';
 import { Backdrop } from '@/ui/Backdrop';
 import { Cursor } from '@/ui/Cursor';
 import { Hud } from '@/ui/Hud';
+import { JsonLd } from '@/ui/JsonLd';
 import { Loader } from '@/ui/Loader';
 import './globals.css';
 
@@ -54,6 +57,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <div aria-hidden="true" className="scene-shade" />
         <Hud />
         <main id="main">{children}</main>
+        <JsonLd data={organizationSchema()} />
+        <JsonLd data={localBusinessSchema()} />
+        <Analytics />
         <Cursor />
         <Loader />
         <AppRuntime />

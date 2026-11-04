@@ -3,6 +3,7 @@ import { beginCopy, heroCopy, howSteps, industries, problemPoints, TAGLINES, tag
 import { whatsappUrl } from '@/content/site';
 import { stats } from '@/content/stats';
 import { testimonials } from '@/content/testimonials';
+import { pageMetadata } from '@/lib/metadata';
 import { getWorld } from '@/timeline/chapters';
 import { ChapterSection } from '@/ui/ChapterSection';
 import { GlassCard } from '@/ui/GlassCard';
@@ -12,6 +13,8 @@ import { ServiceCards } from '@/ui/ServiceCards';
 import { SiteFooter } from '@/ui/SiteFooter';
 import { StatCounter } from '@/ui/StatCounter';
 import { StepList } from '@/ui/StepList';
+
+export const metadata = pageMetadata('/');
 
 export default function HomePage() {
   const [arrival, problem, system, how, who, proof, begin] = getWorld('/').chapters;

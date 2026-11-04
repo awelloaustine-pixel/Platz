@@ -982,3 +982,140 @@ html:not(.js) .loader {
     animation: none;
   }
 }
+
+.contact-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.contact-side {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+}
+
+.contact-side .contact-details {
+  max-width: none;
+  margin-top: 0;
+}
+
+.form-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+/* align-content keeps a field its normal height when the one beside it shows an error. */
+.form-field {
+  display: grid;
+  align-content: start;
+  gap: 0.375rem;
+}
+
+html:not(.js) .contact-form {
+  display: none;
+}
+
+.contact-form input:not(#website),
+.contact-form select {
+  width: 100%;
+  min-height: 2.75rem;
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: 0.5rem;
+  background: rgb(2 6 23 / 0.7);
+  color: #fff;
+  /* 16px stops iOS zooming the page when a field gets focus. */
+  font-size: 1rem;
+  padding: 0 0.75rem;
+}
+
+.contact-form input::placeholder {
+  color: rgb(255 255 255 / 0.6);
+}
+
+.contact-form [aria-invalid='true'] {
+  border-color: #ff8a80;
+}
+
+.form-error {
+  color: #ffb3ab;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* Off screen rather than display:none, which many bots know to skip. */
+.form-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.btn-gold:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.lead-captured {
+  align-self: start;
+  border-color: var(--color-gold);
+  padding: 2rem 1.5rem;
+}
+
+.calendly-frame {
+  width: 100%;
+  height: 34rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+
+/* Google's embed has no dark mode of its own, so the dark look comes from a filter. */
+.map-frame {
+  width: 100%;
+  height: 14rem;
+  border: 0;
+  border-radius: 0.5rem;
+  filter: invert(0.92) hue-rotate(180deg) saturate(0.7) brightness(0.95);
+}
+
+.btn-small {
+  min-height: 2.75rem;
+  padding: 0.375rem 1.125rem;
+  font-size: 0.875rem;
+}
+
+.cookie-banner {
+  position: fixed;
+  right: 0.75rem;
+  bottom: 3.75rem;
+  left: 0.75rem;
+  z-index: 60;
+  border-radius: 1rem;
+  background: rgb(2 6 23 / 0.92);
+  padding: 1rem 1.125rem;
+}
+
+@media (min-width: 40rem) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form-field:has(select) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 64rem) {
+  .contact-grid {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    max-width: calc(100% - 13rem);
+  }
+
+  .cookie-banner {
+    right: auto;
+    bottom: 1.5rem;
+    left: 2.5rem;
+    max-width: 24rem;
+  }
+}

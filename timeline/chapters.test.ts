@@ -53,7 +53,7 @@ test('the rail runs through every chapter shot and ride point in order', () => {
 });
 
 test('a one-shot world has a rail parameter of zero', () => {
-  assert.equal(railParameter(getWorld('/contact').chapters, 0), 0);
+  assert.equal(railParameter(getWorld('/contact').chapters.slice(0, 1), 0), 0);
 });
 
 test('the active chapter changes as the next section arrives and stays in range', () => {

@@ -1,10 +1,12 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { pageSubs } from '@/content/copy';
 import { aiPricing } from '@/content/pricing';
 import { aiProblem, aiSteps, driftingQuestions } from '@/content/services';
+import { pageMetadata } from '@/lib/metadata';
+import { breadcrumbSchema, serviceSchema } from '@/lib/schema';
 import { getWorld } from '@/timeline/chapters';
 import { ChapterSection } from '@/ui/ChapterSection';
+import { JsonLd } from '@/ui/JsonLd';
 import { OracleDemo } from '@/ui/OracleDemo';
 import { OracleOrbLabel } from '@/ui/OracleOrbLabel';
 import { PricingTable } from '@/ui/PricingTable';
@@ -12,7 +14,7 @@ import { SiteFooter } from '@/ui/SiteFooter';
 import { SplitReveal } from '@/ui/SplitReveal';
 import { StepList } from '@/ui/StepList';
 
-export const metadata: Metadata = { title: 'AI Visibility' };
+export const metadata = pageMetadata('/ai-visibility');
 
 const QUESTION_POINTS = ['-3.4,2.6,1', '0.2,3.5,0', '-5.4,1.2,0'];
 
@@ -21,6 +23,8 @@ export default function AiVisibilityPage() {
 
   return (
     <>
+      <JsonLd data={breadcrumbSchema('/ai-visibility', 'AI Visibility')} />
+      <JsonLd data={serviceSchema('AI Visibility (GEO)', pageSubs['/ai-visibility'], aiPricing, '/ai-visibility')} />
       <ChapterSection
         chapter={hero}
         index={0}

@@ -1,13 +1,15 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { story, team, values } from '@/content/team';
+import { pageMetadata } from '@/lib/metadata';
+import { breadcrumbSchema } from '@/lib/schema';
 import { getWorld } from '@/timeline/chapters';
 import { ChapterSection } from '@/ui/ChapterSection';
+import { JsonLd } from '@/ui/JsonLd';
 import { GlassCard } from '@/ui/GlassCard';
 import { SiteFooter } from '@/ui/SiteFooter';
 import { StepList } from '@/ui/StepList';
 
-export const metadata: Metadata = { title: 'About' };
+export const metadata = pageMetadata('/about');
 
 const NODE_POINTS = ['-4.4,3,0.6', '4.4,3,0.6', '-4.4,-3,0.6', '4.4,-3,0.6'];
 
@@ -23,6 +25,7 @@ export default function AboutPage() {
 
   return (
     <>
+      <JsonLd data={breadcrumbSchema('/about', 'About')} />
       <ChapterSection chapter={hero} index={0} heading="h1" showLabel={false} large />
       <ChapterSection chapter={ourStory} index={1}>
         <div className="story">

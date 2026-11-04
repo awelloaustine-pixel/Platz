@@ -1,24 +1,29 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { pageSubs } from '@/content/copy';
 import { automationFaqs } from '@/content/faqs';
 import { automationPricing } from '@/content/pricing';
 import { automationProblem, stations } from '@/content/services';
+import { pageMetadata } from '@/lib/metadata';
+import { breadcrumbSchema, faqSchema, serviceSchema } from '@/lib/schema';
 import { getWorld } from '@/timeline/chapters';
 import { ChapterSection } from '@/ui/ChapterSection';
+import { JsonLd } from '@/ui/JsonLd';
 import { Faq } from '@/ui/Faq';
 import { PricingTable } from '@/ui/PricingTable';
 import { SiteFooter } from '@/ui/SiteFooter';
 import { SplitReveal } from '@/ui/SplitReveal';
 import { StepList } from '@/ui/StepList';
 
-export const metadata: Metadata = { title: 'WhatsApp Automations' };
+export const metadata = pageMetadata('/automations');
 
 export default function AutomationsPage() {
   const [hero, problem, network, pricing, faq] = getWorld('/automations').chapters;
 
   return (
     <>
+      <JsonLd data={breadcrumbSchema('/automations', 'WhatsApp Automations')} />
+      <JsonLd data={serviceSchema('WhatsApp Automations', pageSubs['/automations'], automationPricing, '/automations')} />
+      <JsonLd data={faqSchema(automationFaqs)} />
       <ChapterSection chapter={hero} index={0} heading="h1" showLabel={false} large>
         <div className="reveal reveal-now">
           <p className="lede">{pageSubs['/automations']}</p>

@@ -322,11 +322,18 @@ const worlds: Record<string, World> = {
   '/contact': {
     name: 'Landing',
     chapters: [
-      shot('hero', 'Overview', "Let's Talk About Your Business", 1, { position: [-1, 0.5, 18], target: [-3, 0, 0], fov: 30 }, LANDING_GRADE, {
+      shot('hero', 'Overview', "Let's Talk About Your Business", 1.1, { position: [-1, 0.5, 18], target: [-3, 0, 0], fov: 30 }, LANDING_GRADE, {
         thread: 'resting',
         lit: 12,
         flare: 0.4,
         core: { scale: 0.65, position: [0, 0, 0] },
+      }),
+      // Quiet on purpose: the form is the focus here, so the Core drifts up and away.
+      shot('enquire', 'Get in Touch', 'Get in Touch', 1.1, { position: [0, 1, 22], target: [-1, -1.5, 0], fov: 30 }, LANDING_GRADE, {
+        thread: 'resting',
+        lit: 12,
+        flare: 0.25,
+        core: { scale: 0.4, position: [6, 5, -2] },
       }),
     ],
   },

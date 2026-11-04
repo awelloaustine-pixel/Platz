@@ -14,7 +14,7 @@ import {
 } from 'three';
 import type { Tier } from '@/lib/quality';
 import { getWorld, segment } from '@/timeline/chapters';
-import { master } from '@/timeline/store';
+import { master, ui } from '@/timeline/store';
 import { BEAMS, THREAD_WEIGHTS } from './threadPath';
 import { flareFragmentShader, flareVertexShader, threadFragmentShader, threadVertexShader } from './threadShader';
 
@@ -47,12 +47,20 @@ export function Thread({ pathname, tier }: { pathname: string; tier: Tier }) {
     weights: BEAMS.map(() => 0),
     color: new Color('#D4A62A'),
     flare: 0,
+    pulse: 0,
+    pulseSeen: 0,
   });
 
   useFrame(({ camera, size }, rawDelta) => {
     const delta = Math.min(rawDelta, 1 / 20);
     const state = motion.current;
     state.time += delta;
+    const { leadPulse } = ui.get();
+    if (leadPulse !== state.pulseSeen) {
+      state.pulseSeen = leadPulse;
+      state.pulse = 1;
+    }
+    state.pulse *= Math.exp(-1.2 * delta);
     const shootIn = Math.min(state.time / SHOOT_IN_SECONDS, 1);
     const draw = 1 - Math.pow(1 - shootIn, 3);
 
@@ -74,7 +82,7 @@ export function Thread({ pathname, tier }: { pathname: string; tier: Tier }) {
       const material = materials.current[index];
       if (!material) return;
       material.uniforms.uTime.value = state.time;
-      material.uniforms.uWeight.value = state.weights[index];
+      material.uniforms.uWeight.value = state.weights[index] * (1 + state.pulse * 3);
       material.uniforms.uDraw.value = draw * 1.04;
       material.uniforms.uColor.value.copy(state.color);
       material.visible = state.weights[index] > 0.004;
@@ -85,7 +93,7 @@ export function Thread({ pathname, tier }: { pathname: string; tier: Tier }) {
     if (flareMesh.current && flareMaterial.current) {
       flareMesh.current.quaternion.copy(camera.quaternion);
       const nearness = MathUtils.smoothstep(camera.position.distanceTo(flareMesh.current.position), 3, 10);
-      flareMaterial.current.uniforms.uWeight.value = state.flare * nearness;
+      flareMaterial.current.uniforms.uWeight.value = (state.flare + state.pulse * 2.4) * nearness;
       flareMaterial.current.uniforms.uTime.value = state.time;
       flareMaterial.current.uniforms.uColor.value.copy(state.color);
     }

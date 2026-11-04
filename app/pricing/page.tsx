@@ -1,20 +1,23 @@
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { pageSubs } from '@/content/copy';
 import { allPricing, bundleOffer } from '@/content/pricing';
+import { pageMetadata } from '@/lib/metadata';
+import { breadcrumbSchema } from '@/lib/schema';
 import { getWorld } from '@/timeline/chapters';
 import { ChapterSection } from '@/ui/ChapterSection';
+import { JsonLd } from '@/ui/JsonLd';
 import { GlassCard } from '@/ui/GlassCard';
 import { PricingTable } from '@/ui/PricingTable';
 import { SiteFooter } from '@/ui/SiteFooter';
 
-export const metadata: Metadata = { title: 'Pricing' };
+export const metadata = pageMetadata('/pricing');
 
 export default function PricingPage() {
   const [hero, lanes, bundle] = getWorld('/pricing').chapters;
 
   return (
     <>
+      <JsonLd data={breadcrumbSchema('/pricing', 'Pricing')} />
       <ChapterSection chapter={hero} index={0} heading="h1" showLabel={false} large>
         <div className="reveal reveal-now">
           <p className="lede">{pageSubs['/pricing']}</p>

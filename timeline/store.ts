@@ -46,6 +46,8 @@ export interface UiState {
   worldFocus: number;
   /** The Oracle demo's current question, echoed inside the orb. */
   oracleQuestion: string;
+  /** Goes up by one each time a lead is sent, which fires the thread's pulse. */
+  leadPulse: number;
 }
 
 const initialState: UiState = {
@@ -63,6 +65,7 @@ const initialState: UiState = {
   tierLevel: -1,
   worldFocus: 0,
   oracleQuestion: '',
+  leadPulse: 0,
 };
 
 let state = initialState;

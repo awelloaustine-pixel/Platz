@@ -11,9 +11,28 @@ export const site = {
   // PLACEHOLDER — Victor to supply: business email and Kenya phone number
   email: 'hello@platinummarketingagency.co.ke',
   phone: '+254 700 000 000',
-} as const;
+  // PLACEHOLDER — Victor to supply: links to the business's real social profiles
+  sameAs: [] as string[],
+};
 
 export const whatsappUrl = `https://wa.me/${site.whatsappNumber}`;
+
+// PLACEHOLDER — Victor to supply: NEXT_PUBLIC_CALENDLY_URL
+function calendlyUrl(): string | null {
+  const value = process.env.NEXT_PUBLIC_CALENDLY_URL;
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:' || url.hostname !== 'calendly.com') return null;
+    url.searchParams.set('hide_gdpr_banner', '1');
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+export const calendlyEmbedUrl = calendlyUrl();
+export const mapEmbedUrl = 'https://www.google.com/maps?q=Nairobi%2C%20Kenya&output=embed';
 
 export const footerLinks = {
   Services: [
