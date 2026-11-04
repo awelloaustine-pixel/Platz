@@ -82,6 +82,12 @@ export async function toggleSimpleView(): Promise<void> {
   applyTier();
 }
 
+/** Phones drop WebGL under memory pressure. Treat it as unavailable rather than retrying. */
+export function reportContextLost(): void {
+  ui.set({ webgl: false });
+  applyTier();
+}
+
 /** Called when the running scene cannot hold its frame rate. Only ever steps down. */
 export function reportFrameRateDecline(): void {
   const { tier } = ui.get();

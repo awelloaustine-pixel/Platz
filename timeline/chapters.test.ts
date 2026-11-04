@@ -3,6 +3,8 @@ import { test } from 'node:test';
 import {
   activeChapterIndex,
   buildRail,
+  chapterAtScroll,
+  posterPath,
   formatChapter,
   getWorld,
   railParameter,
@@ -54,6 +56,22 @@ test('the rail runs through every chapter shot and ride point in order', () => {
 
 test('a one-shot world has a rail parameter of zero', () => {
   assert.equal(railParameter(getWorld('/contact').chapters.slice(0, 1), 0), 0);
+});
+
+test('scroll position converts to a fractional chapter', () => {
+  const tops = [0, 1000, 3000, 3000];
+  assert.equal(chapterAtScroll(0, tops), 0);
+  assert.equal(chapterAtScroll(500, tops), 0.5);
+  assert.equal(chapterAtScroll(2000, tops), 1.5);
+  assert.equal(chapterAtScroll(9000, tops), 3);
+  assert.equal(chapterAtScroll(100, [0]), 0);
+  assert.equal(chapterAtScroll(100, []), 0);
+});
+
+test('every world and chapter has a poster name', () => {
+  assert.equal(posterPath('/', 1, true), '/posters/home-problem-m.webp');
+  assert.equal(posterPath('/automations', 3, false), '/posters/automations-d.webp');
+  assert.equal(posterPath('/not-a-page', 0, false), '/posters/contact-d.webp');
 });
 
 test('the active chapter changes as the next section arrives and stays in range', () => {

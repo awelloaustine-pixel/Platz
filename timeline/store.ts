@@ -29,7 +29,6 @@ export function emitMaster(): void {
 export interface UiState {
   chapterIndex: number;
   litCount: number;
-  leadsCaptured: number;
   /** null until detection has finished. */
   tier: Tier | null;
   autoTier: Tier | null;
@@ -53,7 +52,6 @@ export interface UiState {
 const initialState: UiState = {
   chapterIndex: 0,
   litCount: 0,
-  leadsCaptured: 0,
   tier: null,
   autoTier: null,
   runtimeCap: null,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useFrame } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   AdditiveBlending,
   CatmullRomCurve3,
@@ -15,29 +15,42 @@ import {
 import type { Tier } from '@/lib/quality';
 import { getWorld, segment } from '@/timeline/chapters';
 import { master, ui } from '@/timeline/store';
-import { BEAMS, THREAD_WEIGHTS } from './threadPath';
+import { BEAMS, type BeamDefinition, groupsUsedBy, THREAD_WEIGHTS } from './threadPath';
 import { flareFragmentShader, flareVertexShader, threadFragmentShader, threadVertexShader } from './threadShader';
 
 const SHOOT_IN_SECONDS = 1.8;
 const accentA = new Color();
 const accentB = new Color();
 
+const builtBeams = new Map<string, BeamDefinition & { key: number; geometry: TubeGeometry; length: number }>();
+
+function buildBeam(index: number, tier: Tier) {
+  const id = `${tier}-${index}`;
+  let built = builtBeams.get(id);
+  if (!built) {
+    const beam = BEAMS[index];
+    const closed = Boolean(beam.closed);
+    const curve = new CatmullRomCurve3(beam.points.map(([x, y, z]) => new Vector3(x, y, z)), closed);
+    built = {
+      ...beam,
+      key: index,
+      geometry: new TubeGeometry(curve, tier === 'high' ? 220 : 110, beam.radius, tier === 'high' ? 10 : 6, closed),
+      length: curve.getLength(),
+    };
+    builtBeams.set(id, built);
+  }
+  return built;
+}
+
 export function Thread({ pathname, tier }: { pathname: string; tier: Tier }) {
+  // Pages seen so far. Their beams stay built, so that leaving a page can still fade them out.
+  const [paths, setPaths] = useState<readonly string[]>([pathname]);
+  if (!paths.includes(pathname)) setPaths([...paths, pathname]);
+
   const beams = useMemo(() => {
-    const radial = tier === 'high' ? 10 : 6;
-    return BEAMS.map((beam, index) => {
-      const curve = new CatmullRomCurve3(
-        beam.points.map(([x, y, z]) => new Vector3(x, y, z)),
-        Boolean(beam.closed),
-      );
-      return {
-        ...beam,
-        key: index,
-        geometry: new TubeGeometry(curve, tier === 'high' ? 320 : 180, beam.radius, radial, Boolean(beam.closed)),
-        length: curve.getLength(),
-      };
-    });
-  }, [tier]);
+    const used = groupsUsedBy(paths.flatMap((path) => getWorld(path).chapters.map((chapter) => chapter.thread)));
+    return BEAMS.flatMap((beam, index) => (used.has(beam.group) ? [buildBeam(index, tier)] : []));
+  }, [paths, tier]);
 
   const materials = useRef<(ShaderMaterial | null)[]>([]);
   const flareMesh = useRef<Mesh>(null);
@@ -73,7 +86,8 @@ export function Thread({ pathname, tier }: { pathname: string; tier: Tier }) {
     accentA.set(a.grade.accent).lerp(accentB.set(b.grade.accent), blend);
     state.color.lerp(accentA, amount);
 
-    beams.forEach((beam, index) => {
+    beams.forEach((beam) => {
+      const index = beam.key;
       // On portrait phones the text sits directly below the hub, where the vertical beam would run.
       const placement = beam.group === 'cross' && size.width < size.height ? 0.2 : 1;
       const target =

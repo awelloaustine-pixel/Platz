@@ -228,6 +228,17 @@ const NONE: Record<BeamGroup, number> = {
   stream: 0,
 };
 
+/** The beams a world needs, so that none are built before a page uses them. */
+export function groupsUsedBy(states: readonly ThreadState[]): Set<BeamGroup> {
+  const used = new Set<BeamGroup>();
+  for (const state of states) {
+    for (const [group, weight] of Object.entries(THREAD_WEIGHTS[state])) {
+      if (weight > 0) used.add(group as BeamGroup);
+    }
+  }
+  return used;
+}
+
 /** How strongly each group of beams shows in each story state. */
 export const THREAD_WEIGHTS: Record<ThreadState, Record<BeamGroup, number>> = {
   crossing: { ...NONE, main: 1, cross: 1 },

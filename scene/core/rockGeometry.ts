@@ -1,5 +1,6 @@
 import { BufferGeometry, IcosahedronGeometry, Vector3 } from 'three';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import type { Tier } from '@/lib/quality';
 import { seededRandom } from '@/lib/random';
 
 function hash(x: number, y: number, z: number): number {
@@ -68,4 +69,34 @@ export function createRockGeometry(seed: number, detail: number): BufferGeometry
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
   return geometry;
+}
+
+/**
+ * Mesh detail is the costliest number in the scene to raise: time grows with its square. The
+ * material's shader supplies the fine surface, so these only need to carry the silhouette.
+ */
+export function rockSettings(tier: Tier): { detail: number; variants: number } {
+  return tier === 'high' ? { detail: 22, variants: 3 } : { detail: 10, variants: 2 };
+}
+
+const seedFor = (variant: number) => 101 + variant * 37;
+const cache = new Map<string, BufferGeometry>();
+
+export function getRockGeometry(variant: number, detail: number): BufferGeometry {
+  const key = `${variant}-${detail}`;
+  let geometry = cache.get(key);
+  if (!geometry) {
+    geometry = createRockGeometry(seedFor(variant), detail);
+    cache.set(key, geometry);
+  }
+  return geometry;
+}
+
+/** Sculpts the rocks one per slice of time, so that the page can respond in between. */
+export async function prebuildRocks(tier: Tier, nextSlice: () => Promise<void>): Promise<void> {
+  const { detail, variants } = rockSettings(tier);
+  for (let variant = 0; variant < variants; variant += 1) {
+    await nextSlice();
+    getRockGeometry(variant, detail);
+  }
 }

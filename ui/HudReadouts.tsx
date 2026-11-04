@@ -18,7 +18,7 @@ function NairobiClock() {
   useEffect(() => {
     const update = () => setTime(nairobiTime.format(new Date()));
     const first = setTimeout(update, 0);
-    const interval = setInterval(update, 15000);
+    const interval = setInterval(update, 2000);
     return () => {
       clearTimeout(first);
       clearInterval(interval);
@@ -30,7 +30,6 @@ function NairobiClock() {
 
 export function HudReadouts() {
   const litCount = useUi((state) => state.litCount);
-  const leads = useUi((state) => state.leadsCaptured);
   const tier = useUi((state) => state.tier);
   const canToggle = useUi((state) => state.webgl && !state.reducedMotion);
 
@@ -51,10 +50,6 @@ export function HudReadouts() {
             STONES<span className="hidden lg:inline"> LIT</span>
           </dt>
           <dd className="text-white tabular-nums">{litCount}/12</dd>
-        </div>
-        <div className="hidden gap-1.5 sm:flex">
-          <dt>LEADS CAPTURED</dt>
-          <dd className="text-white tabular-nums">{String(leads).padStart(3, '0')}</dd>
         </div>
       </dl>
       {canToggle && (

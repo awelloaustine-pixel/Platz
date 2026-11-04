@@ -271,13 +271,13 @@ html.lenis body {
   display: inline-block;
 }
 
-.js .reveal:not(.reveal-now) .split-char {
+.jsr .reveal:not(.reveal-now) .split-char {
   opacity: 0;
   transform: translateY(0.35em);
   filter: blur(6px);
 }
 
-.js .reveal.is-in:not(.reveal-now) .split-char {
+.jsr .reveal.is-in:not(.reveal-now) .split-char {
   opacity: 1;
   transform: none;
   filter: none;
@@ -291,11 +291,11 @@ html.lenis body {
 /* Body text: a mask wipes down over it, rather than a generic fade-up. */
 /* The mask goes on the children: a fully clipped element counts as off screen to the
    IntersectionObserver watching it, so masking .reveal itself would never reveal anything. */
-.js .stage-body .reveal:not(.is-in, .reveal-now) > * {
+.jsr .stage-body .reveal:not(.is-in, .reveal-now) > * {
   clip-path: inset(0 0 100% 0);
 }
 
-.js .stage-body .reveal.is-in:not(.reveal-now) > * {
+.jsr .stage-body .reveal.is-in:not(.reveal-now) > * {
   clip-path: inset(-30% -30% -30% -30%);
   transition: clip-path 900ms cubic-bezier(0.2, 0.8, 0.2, 1) 180ms;
 }
@@ -656,20 +656,20 @@ html:not(.js) .loader {
     animation: none;
   }
 
-  .js .reveal:not(.reveal-now) .split-char,
-  .js .reveal.is-in:not(.reveal-now) .split-char {
+  .jsr .reveal:not(.reveal-now) .split-char,
+  .jsr .reveal.is-in:not(.reveal-now) .split-char {
     filter: none;
     transform: none;
     transition: opacity 300ms ease;
     transition-delay: 0ms;
   }
 
-  .js .stage-body .reveal:not(.is-in, .reveal-now) > * {
+  .jsr .stage-body .reveal:not(.is-in, .reveal-now) > * {
     clip-path: none;
     opacity: 0;
   }
 
-  .js .stage-body .reveal.is-in:not(.reveal-now) > * {
+  .jsr .stage-body .reveal.is-in:not(.reveal-now) > * {
     clip-path: none;
     opacity: 1;
     transition: opacity 300ms ease;
@@ -1117,5 +1117,51 @@ html:not(.js) .contact-form {
     bottom: 1.5rem;
     left: 2.5rem;
     max-width: 24rem;
+  }
+}
+
+/* Lite: the pre-rendered still for the current chapter. */
+.poster {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  animation: poster-in 700ms ease both;
+}
+
+@keyframes poster-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Blurring what scrolls behind a card is expensive, and Lite is for phones that struggle. */
+html[data-quality='lite'] .glass {
+  background: rgb(12 17 34 / 0.88);
+  backdrop-filter: none;
+}
+
+/* Below desktop, reveals run on the browser's scroll position alone. Waiting for JavaScript
+   would leave blank sections on a slow phone, and without support the text simply shows. */
+@media (max-width: 63.99rem) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal:not(.reveal-now) {
+      animation: rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster {
+    animation-duration: 200ms;
   }
 }

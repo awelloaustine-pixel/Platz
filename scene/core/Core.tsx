@@ -16,11 +16,10 @@ import type { Tier } from '@/lib/quality';
 import { seededRandom } from '@/lib/random';
 import { activeChapterIndex, getWorld, sampleChapter, segment } from '@/timeline/chapters';
 import { master, ui } from '@/timeline/store';
-import { createRockGeometry } from './rockGeometry';
+import { getRockGeometry, rockSettings } from './rockGeometry';
 import { createRockMaterial } from './rockMaterial';
 
 const TOTAL_STONES = 12;
-const VARIANTS = 4;
 const RING_RADIUS = 5.2;
 const SPRING = 26;
 const DAMPING = 7.5;
@@ -44,11 +43,11 @@ interface Stone {
   away: Vector3;
 }
 
-function buildStones(count: number): Stone[] {
+function buildStones(count: number, variants: number): Stone[] {
   const random = seededRandom(19);
-  const slots = new Array<number>(VARIANTS).fill(0);
+  const slots = new Array<number>(variants).fill(0);
   return Array.from({ length: count }, (_, index) => {
-    const variant = index % VARIANTS;
+    const variant = index % variants;
     // Evenly spread over a small sphere: the tight boulder the ring pulls in to.
     const y = 1 - ((index + 0.5) / count) * 2;
     const around = index * Math.PI * (3 - Math.sqrt(5));
@@ -72,18 +71,18 @@ function buildStones(count: number): Stone[] {
 
 export function Core({ pathname, tier }: { pathname: string; tier: Tier }) {
   const stoneCount = tier === 'high' ? TOTAL_STONES : 8;
-  const stones = useMemo(() => buildStones(stoneCount), [stoneCount]);
+  const { detail, variants: variantCount } = rockSettings(tier);
+  const stones = useMemo(() => buildStones(stoneCount, variantCount), [stoneCount, variantCount]);
 
   const variants = useMemo(() => {
-    const detail = tier === 'high' ? 36 : 18;
-    return Array.from({ length: VARIANTS }, (_, variant) => {
+    return Array.from({ length: variantCount }, (_, variant) => {
       const count = stones.filter((stone) => stone.variant === variant).length;
-      const geometry = createRockGeometry(101 + variant * 37, detail);
+      const geometry = getRockGeometry(variant, detail);
       geometry.setAttribute('aEmissive', new InstancedBufferAttribute(new Float32Array(count * 3), 3));
       geometry.setAttribute('aFront', new InstancedBufferAttribute(new Float32Array(count), 1));
       return { geometry, count };
     });
-  }, [stones, tier]);
+  }, [stones, detail, variantCount]);
   const material = useMemo(() => createRockMaterial(2), []);
 
   const meshes = useRef<(InstancedMesh | null)[]>([]);

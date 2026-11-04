@@ -52,8 +52,6 @@ export interface ChapterConfig {
   flare: number;
   /** Strength of the Nairobi skyline lights in the distance. */
   city: number;
-  /** Running value of the LEADS CAPTURED readout when this shot is at rest. */
-  leads: number;
 }
 
 export interface World {
@@ -84,7 +82,6 @@ const home: readonly ChapterConfig[] = [
     thread: 'crossing',
     flare: 1,
     city: 1,
-    leads: 0,
   },
   {
     id: 'problem',
@@ -99,7 +96,6 @@ const home: readonly ChapterConfig[] = [
     thread: 'splintered',
     flare: 0.5,
     city: 0,
-    leads: 0,
   },
   {
     id: 'system',
@@ -114,7 +110,6 @@ const home: readonly ChapterConfig[] = [
     thread: 'lanes',
     flare: 0.3,
     city: 0,
-    leads: 3,
   },
   {
     id: 'how',
@@ -137,7 +132,6 @@ const home: readonly ChapterConfig[] = [
     thread: 'riding',
     flare: 0.9,
     city: 0,
-    leads: 12,
   },
   {
     id: 'who',
@@ -152,7 +146,6 @@ const home: readonly ChapterConfig[] = [
     thread: 'orbit',
     flare: 0.9,
     city: 0,
-    leads: 28,
   },
   {
     id: 'proof',
@@ -167,7 +160,6 @@ const home: readonly ChapterConfig[] = [
     thread: 'flowing',
     flare: 1,
     city: 0,
-    leads: 64,
   },
   {
     id: 'begin',
@@ -182,7 +174,6 @@ const home: readonly ChapterConfig[] = [
     thread: 'loop',
     flare: 1.2,
     city: 0,
-    leads: 96,
   },
 ];
 
@@ -211,7 +202,6 @@ function shot(
     thread: 'resting',
     flare: 0,
     city: 0,
-    leads: 0,
     ...rest,
   };
 }
@@ -387,6 +377,24 @@ export function railParameter(chapters: readonly ChapterConfig[], chapter: numbe
     total += 1 + (config.ride?.length ?? 0);
   });
   return total > 1 ? (start + (end - start) * blend) / (total - 1) : 0;
+}
+
+/** Fractional chapter for a scroll position, given each section's measured top. */
+export function chapterAtScroll(scroll: number, tops: readonly number[]): number {
+  for (let index = tops.length - 2; index >= 0; index -= 1) {
+    if (scroll >= tops[index] && tops[index + 1] > tops[index]) {
+      return Math.min(index + (scroll - tops[index]) / (tops[index + 1] - tops[index]), tops.length - 1);
+    }
+  }
+  return 0;
+}
+
+/** The home page has a still per chapter. Other pages share one still per world, to save data. */
+export function posterPath(pathname: string, chapterIndex: number, portrait: boolean): string {
+  const size = portrait ? 'm' : 'd';
+  if (pathname === '/') return `/posters/home-${home[chapterIndex]?.id ?? home[0].id}-${size}.webp`;
+  const known = worlds[pathname] ? pathname : '/contact';
+  return `/posters/${known.slice(1)}-${size}.webp`;
 }
 
 export function activeChapterIndex(chapter: number, count: number): number {

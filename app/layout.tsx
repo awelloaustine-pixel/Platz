@@ -25,6 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   weight: ['400'],
   display: 'swap',
+  preload: false,
   variable: '--font-jetbrains-mono',
 });
 
@@ -40,7 +41,7 @@ export const viewport: Viewport = {
 };
 
 // Runs before first paint. Without it (no JS) nothing is hidden, so every visitor gets the text.
-const PRE_PAINT_SCRIPT = `(function(){var r=document.documentElement;r.classList.add('js');try{var c=navigator.connection;if(sessionStorage.getItem('platinum.seen')||innerWidth<1024||(c&&(c.saveData||/2g|3g/.test(c.effectiveType||'')))||matchMedia('(prefers-reduced-motion: reduce)').matches){r.classList.add('seen')}sessionStorage.setItem('platinum.seen','1')}catch(e){r.classList.add('seen')}})()`;
+const PRE_PAINT_SCRIPT = `(function(){var r=document.documentElement;r.classList.add('js');if(innerWidth>=1024)r.classList.add('jsr');try{var c=navigator.connection;if(sessionStorage.getItem('platinum.seen')||innerWidth<1024||(c&&(c.saveData||/2g|3g/.test(c.effectiveType||'')))||matchMedia('(prefers-reduced-motion: reduce)').matches){r.classList.add('seen')}sessionStorage.setItem('platinum.seen','1')}catch(e){r.classList.add('seen')}})()`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

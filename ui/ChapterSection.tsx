@@ -44,7 +44,7 @@ export function ChapterSection({
       <div className="chapter-track" style={{ '--span': chapter.span } as CSSProperties}>
         <div className="chapter-stage">
           <div className={index === 0 ? 'reveal reveal-now' : 'reveal'}>
-            {eyebrow && <p className="hud-text mb-4 text-gold">{eyebrow}</p>}
+            {eyebrow && <p className="hud-text mb-4 text-white lg:text-gold">{eyebrow}</p>}
             {showLabel && (
               <p className="hud-text mb-4 text-white/85">
                 {formatChapter(index)} —— {chapter.label}
